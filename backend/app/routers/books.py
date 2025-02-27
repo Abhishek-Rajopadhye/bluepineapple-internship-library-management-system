@@ -21,8 +21,10 @@ def getBooks() -> list:
     try:
         books = book_crud.get_all_books()
         return books, 200
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except KeyError as keyError:
+        raise HTTPException(status_code=400, detail=str(keyError))
+    except RuntimeError as runtimeError:
+        raise HTTPException(status_code=500, detail=str(runtimeError))
 
 @router.get("/{book_id}")
 def getBook(book_id: str) -> dict:

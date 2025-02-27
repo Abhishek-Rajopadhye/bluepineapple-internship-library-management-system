@@ -20,7 +20,7 @@ def get_all_allocation():
         conn.close()
         return [dict(allocation) for allocation in allocations]
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -42,7 +42,7 @@ def get_allocation(allocation_id: int):
         conn.close()
         return dict(allocation)
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -64,7 +64,7 @@ def get_allocations_of_book(book_id: int):
         conn.close()
         return [dict(allocation) for allocation in allocations]
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -86,7 +86,7 @@ def get_allocations_of_member(member_id: int):
         conn.close()
         return [dict(allocation) for allocation in allocations]
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -109,7 +109,7 @@ def get_allocation_of_book_of_member(book_id: int, member_id: int):
         conn.close()
         return dict(allocation)
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -133,11 +133,11 @@ def add_allocation(allocation: Allocation):
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
-def edit_allocation(allocation: Allocation):
+def edit_allocation(allocation_id:int, allocation: Allocation):
     """
     Edit an existing allocation's details in the database.
     Connects to the database, executes an update query to modify the allocation's details, and commits the transaction.
@@ -150,14 +150,22 @@ def edit_allocation(allocation: Allocation):
         exception: If any other error occurs
     """
     try:
+        if(allocation_id <= 0):
+            raise ValueError("Allocation ID must be a positive integer")
+
         conn = get_db_connection()
         cursor = conn.cursor()
+        allocation = conn.execute("SELECT * FROM Allocations WHERE id=?;", (allocation_id,)).fetchone()
+        
+        if(not allocation):
+            raise KeyError("Allocation not found")
+        
         cursor.execute("UPDATE Allocations SET book_id=?, member_id=?, start_date=?, end_date=?, returned=?, overdue=? WHERE id=?;",
-                       (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue, allocation.id))
+                       (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue, allocation_id))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -174,12 +182,20 @@ def delete_allocation(allocation_id: int):
         exception: If any other error occurs
     """
     try:
+        if(allocation_id <= 0):
+            raise ValueError("Allocation ID must be a positive integer")
+
         conn = get_db_connection()
         cursor = conn.cursor()
+        allocation = conn.execute("SELECT * FROM Allocations WHERE id=?;", (allocation_id,)).fetchone()
+        
+        if(not allocation):
+            raise KeyError("Allocation not found")
+        
         cursor.execute("DELETE FROM Allocations WHERE id=?;", (allocation_id,))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")

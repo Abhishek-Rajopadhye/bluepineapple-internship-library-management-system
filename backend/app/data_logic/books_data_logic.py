@@ -11,15 +11,16 @@ def get_all_books():
     Returns:
         list: A list of dictionaries, each representing a book.
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If there occurs any other issue    """
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs.
+    """
     try:
         conn = get_db_connection()
         books = conn.execute("SELECT * FROM Books;").fetchall()
         conn.close()
         return [dict(book) for book in books]
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -32,15 +33,58 @@ def get_book(book_id: int):
     Returns:
         dict: A dictionary representing the book.
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If there occurs any other issue    """
+        ValueError: If the book ID is not a positive integer.
+        KeyError: If the book is not found.
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs.
+    """
     try:
+        if(book_id <= 0):
+            raise ValueError("Book ID must be a positive integer")
+
         conn = get_db_connection()
         book = conn.execute("SELECT * FROM Books WHERE id=?;", (book_id,)).fetchone()
         conn.close()
+        
+        if(not book):
+            raise KeyError("Book not found")
+        
         return dict(book)
+
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
+    except Exception as exception:
+        raise Exception(f"Error: {exception}")
+
+def get_book_by_name(book_name: str):
+    """
+    Retrieve a specific book from the database by its name.
+    Connects to the database, executes a query to fetch the book with the given name, and returns the result as a dictionary.
+    Parameters:
+        book_name (str): The name of the book to retrieve.
+    Returns:
+        dict: A dictionary representing the book.
+    Raises:
+        ValueError: If the book name is empty.
+        KeyError: If the book is not found.
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs.
+    """
+    try:
+        if(book_name == ""):
+            raise ValueError("Book Name must be valid")
+
+        conn = get_db_connection()
+        book = conn.execute("SELECT * FROM Books WHERE name=?;", (book_name,)).fetchone()
+        conn.close()
+        
+        if(not book):
+            raise KeyError("Book not found")
+        
+        return dict(book)
+
+    except sqlite3.Error as sqliteError:
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -53,8 +97,10 @@ def add_book(book: Book):
     Returns:
         None
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If there occurs any other issue    """
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        sqlite3.IntegrityError: If there is a constraint violation or duplicate entry.
+        Exception: If any other error occurs.
+    """
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
@@ -62,7 +108,9 @@ def add_book(book: Book):
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
+    except sqlite3.IntegrityError:
+        raise Exception("Integrity error: Possible duplicate or constraint violation")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -76,19 +124,29 @@ def edit_book(book_id:int, book: Book):
     Returns:
         None
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If there occurs any other issue
+        ValueError: If the book ID is not a positive integer.
+        KeyError: If the book is not found.
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs.
     """
     try:
+        if(book_id <= 0):
+            raise ValueError("Book ID must be a positive integer")
+
         conn = get_db_connection()
         cursor = conn.cursor()
+        book = conn.execute("SELECT * FROM Books WHERE id=?;", (book_id,)).fetchone()
+        
+        if(not book):
+            raise KeyError("Book not found")
+        
         cursor.execute("UPDATE Books SET name=?, author=?, total_copies=?, allocated_copies=? WHERE id=?;", (book.name, book.author, book.total_copies, book.allocated_copies, book_id))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
-        raise Exception(f"Error: {exception}")
+        raise RuntimeError(f"Error: {exception}")
 
 def delete_book(book_id: int):
     """
@@ -99,16 +157,26 @@ def delete_book(book_id: int):
     Returns:
         None
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If there occurs any other issue
+        ValueError: If the book ID is not a positive integer.
+        KeyError: If the book is not found.
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs.
     """
     try:
+        if(book_id <= 0):
+            raise ValueError("Book ID must be a positive integer")
+
         conn = get_db_connection()
         cursor = conn.cursor()
+        book = conn.execute("SELECT * FROM Books WHERE id=?;", (book_id,)).fetchone()
+        
+        if(not book):
+            raise KeyError("Book not found")
+
         cursor.execute("DELETE FROM Books WHERE id=?;", (book_id,))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")

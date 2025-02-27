@@ -19,7 +19,7 @@ def get_all_members():
         conn.close()
         return [dict(member) for member in members]
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as e:
         raise Exception(f"Error: {e}")
 
@@ -35,14 +35,56 @@ def get_member(member_id: int):
         sqliteError: If there is an issue with the database connection or query execution.
     """
     try:
+        if(member_id <= 0):
+            raise ValueError("Member ID must be a positive integer")
+
         conn = get_db_connection()
         member = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
         conn.close()
+
+        if(not member):
+            raise KeyError("Member not found")
+
         return dict(member)
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as e:
         raise Exception(f"Error: {e}")
+
+def get_member_by_name(member_name: str):
+    """
+    Retrieve a specific member from the database by its name.
+    Connects to the database, executes a query to fetch the member with the given name, and returns the result as a dictionary.
+    Parameters:
+        member_name (str): The name of the member to retrieve.
+    Returns:
+        dict: A dictionary representing the member.
+    Raises:
+        ValueError: If the member name is empty.
+        KeyError: If the member is not found.
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs.
+    """
+    try:
+        if(member_name == ""):
+            raise ValueError("Member Name must be valid")
+
+        conn = get_db_connection()
+        member = conn.execute("SELECT * FROM Members WHERE name=?;", (member_name,)).fetchone()
+        conn.close()
+        
+        if(not member):
+            raise KeyError("Member not found")
+        
+        return dict(member)
+
+    except sqlite3.Error as sqliteError:
+        raise sqlite3.Error(f"Database error: {sqliteError}")
+    except Exception as exception:
+        raise Exception(f"Error: {exception}")
+
+
+
 
 def add_member(member: Member):
     """
@@ -62,11 +104,13 @@ def add_member(member: Member):
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
+    except sqlite3.IntegrityError:
+        raise Exception("Integrity error: Possible duplicate or constraint violation")
     except Exception as e:
         raise Exception(f"Error: {e}")
 
-def edit_member(member: Member):
+def edit_member(member_id:int, member: Member):
     """
     Edit an existing member's details in the database.
     Connects to the database, executes an update query to modify the member's details, and commits the transaction.
@@ -78,13 +122,21 @@ def edit_member(member: Member):
         sqliteError: If there is an issue with the database connection or query execution.
     """
     try:
+        if(member_id <= 0):
+            raise ValueError("member ID must be a positive integer")
+
         conn = get_db_connection()
         cursor = conn.cursor()
+        member = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
+        
+        if(not member):
+            raise KeyError("Member not found")
+        
         cursor.execute("UPDATE Members SET name=?, email=?, phone=? WHERE id=?;", (member.name, member.email, member.phone, member.id))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as e:
         raise Exception(f"Error: {e}")
 
@@ -100,12 +152,21 @@ def delete_member(member_id: int):
         sqliteError: If there is an issue with the database connection or query execution.
     """
     try:
+        if(member_id <= 0):
+            raise ValueError("Member ID must be a positive integer")
+
         conn = get_db_connection()
         cursor = conn.cursor()
+        member = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
+        
+        if(not member):
+            raise KeyError("Member not found")
+        
         cursor.execute("DELETE FROM Members WHERE id=?;", (member_id,))
+        
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
-        raise Exception(f"Database error: {sqliteError}")
+        raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as e:
         raise Exception(f"Error: {e}")
