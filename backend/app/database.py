@@ -10,10 +10,10 @@ def get_db_connection():
     Parameters:
         None
     Returns:
-        sqlite3.Connection: A connection object to the SQLite database.
+        conn (sqlite3.Connection): A connection object to the SQLite database.
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If any other error occurs
+        sqlit3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs
     """
     try:
         conn = sqlite3.connect(str(DB_PATH.absolute()))
@@ -33,8 +33,8 @@ def init_db():
     Returns:
         None
     Raises:
-        sqliteError: If there is an issue with the database connection or query execution.
-        exception: If any other error occurs
+        sqlite3.Error: If there is an issue with the database connection or query execution.
+        Exception: If any other error occurs
     """
     try:
         conn = get_db_connection()

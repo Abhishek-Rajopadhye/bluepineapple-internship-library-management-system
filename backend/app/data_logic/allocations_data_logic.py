@@ -9,7 +9,7 @@ def get_all_allocation():
     Parameters:
         None
     Returns:
-        list: A list of dictionaries, each representing an allocation.
+        allocations (list): A list of dictionaries, each representing an allocation.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
         exception: If any other error occurs
@@ -31,7 +31,7 @@ def get_allocation(allocation_id: int):
     Parameters:
         allocation_id (int): The ID of the allocation to retrieve.
     Returns:
-        dict: A dictionary representing the allocation.
+        allocation (dict): A dictionary representing the allocation.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
         exception: If any other error occurs
@@ -53,7 +53,7 @@ def get_allocations_of_book(book_id: int):
     Parameters:
         book_id (int): The ID of the book to retrieve allocations for.
     Returns:
-        list: A list of dictionaries, each representing an allocation.
+        allocations (list): A list of dictionaries, each representing an allocation.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
         exception: If any other error occurs
@@ -75,7 +75,7 @@ def get_allocations_of_member(member_id: int):
     Parameters:
         member_id (int): The ID of the member to retrieve allocations for.
     Returns:
-        list: A list of dictionaries, each representing an allocation.
+        allocations (list): A list of dictionaries, each representing an allocation.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
         exception: If any other error occurs
@@ -90,7 +90,7 @@ def get_allocations_of_member(member_id: int):
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
-def get_allocation_of_book_of_member(book_id: int, member_id: int):
+def get_allocation_by_book_and_member(book_id: int, member_id: int):
     """
     Retrieve a specific allocation for a book and member from the database.
     Connects to the database, executes a query to fetch the allocation with the given book ID and member ID, and returns the result as a dictionary.
@@ -98,7 +98,7 @@ def get_allocation_of_book_of_member(book_id: int, member_id: int):
         book_id (int): The ID of the book.
         member_id (int): The ID of the member.
     Returns:
-        dict: A dictionary representing the allocation.
+        allocation (dict): A dictionary representing the allocation.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
         exception: If any other error occurs

@@ -9,7 +9,7 @@ def get_all_books():
     Parameters:
         None
     Returns:
-        list: A list of dictionaries, each representing a book.
+        books (list): A list of dictionaries, each representing a book.
     Raises:
         sqlite3.Error: If there is an issue with the database connection or query execution.
         Exception: If any other error occurs.
@@ -31,7 +31,7 @@ def get_book(book_id: int):
     Parameters:
         book_id (int): The ID of the book to retrieve.
     Returns:
-        dict: A dictionary representing the book.
+        book (dict): A dictionary representing the book.
     Raises:
         ValueError: If the book ID is not a positive integer.
         KeyError: If the book is not found.
@@ -63,7 +63,7 @@ def get_book_by_name(book_name: str):
     Parameters:
         book_name (str): The name of the book to retrieve.
     Returns:
-        dict: A dictionary representing the book.
+        book (dict): A dictionary representing the book.
     Raises:
         ValueError: If the book name is empty.
         KeyError: If the book is not found.

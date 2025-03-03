@@ -9,7 +9,7 @@ def get_all_members():
     Parameters:
         None
     Returns:
-        list: A list of dictionaries, each representing a member.
+        members (list): A list of dictionaries, each representing a member.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
     """
@@ -30,7 +30,7 @@ def get_member(member_id: int):
     Parameters:
         member_id (int): The ID of the member to retrieve.
     Returns:
-        dict: A dictionary representing the member.
+        member (dict): A dictionary representing the member.
     Raises:
         sqliteError: If there is an issue with the database connection or query execution.
     """
@@ -58,7 +58,7 @@ def get_member_by_name(member_name: str):
     Parameters:
         member_name (str): The name of the member to retrieve.
     Returns:
-        dict: A dictionary representing the member.
+        member (dict): A dictionary representing the member.
     Raises:
         ValueError: If the member name is empty.
         KeyError: If the member is not found.
@@ -82,9 +82,6 @@ def get_member_by_name(member_name: str):
         raise sqlite3.Error(f"Database error: {sqliteError}")
     except Exception as exception:
         raise Exception(f"Error: {exception}")
-
-
-
 
 def add_member(member: Member):
     """

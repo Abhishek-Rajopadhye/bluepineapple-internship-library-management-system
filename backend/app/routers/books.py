@@ -1,30 +1,29 @@
 from fastapi import APIRouter, HTTPException
 from models import Book
 import data_logic.books_data_logic as book_crud
+import sqlite3
 
 router = APIRouter(tags=["Books"])
 
 @router.get("/")
 def getBooks() -> list:
     """
-    Summary:
-        Retrieve all books from the database.
-    Working:
-        Calls the get_all_books function from the book_crud module to fetch all books and returns the result.
+    Retrieve all books from the database.
+    Calls the get_all_books function from the book_crud module to fetch all books and returns the result.
     Parameters:
         None
     Returns:
-        list: A list of dictionaries, each representing a book.
+        books (list): A list of dictionaries, each representing a book.
     Raises:
-        HTTPException (500): If there is an issue with fetching the books.
+        HTTPException (500): If any error occurs during fetching of books.
     """
     try:
         books = book_crud.get_all_books()
         return books, 200
-    except KeyError as keyError:
-        raise HTTPException(status_code=400, detail=str(keyError))
-    except RuntimeError as runtimeError:
-        raise HTTPException(status_code=500, detail=str(runtimeError))
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 @router.get("/{book_id}")
 def getBook(book_id: str) -> dict:
@@ -34,15 +33,23 @@ def getBook(book_id: str) -> dict:
     Parameters:
         book_id (str): The ID of the book to retrieve.
     Returns:
-        dict: A dictionary representing the book.
+        book (dict): A dictionary representing the book.
     Raises:
-        HTTPException (500): If there is an issue with fetching the book.
+        HTTPException (400): If the book ID is not a positive integer.
+        HTTPException (404): If the book is not found.
+        HTTPException (500): If any error occurs during fetching of the book.
     """
     try:
         book = book_crud.get_book(int(book_id))
         return book, 200
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 @router.post("/")
 def addBook(book: Book) -> dict:
@@ -52,15 +59,20 @@ def addBook(book: Book) -> dict:
     Parameters:
         book (Book): An instance of the Book class containing the book's details.
     Returns:
-        dict: A success message.
+        msg (dict): A success message.
     Raises:
-        HTTPException (500): If there is an issue with adding the book.
+        HTTPException (400): If there is an integrity error.
+        HTTPException (500): If any error occurs during adding of the book.
     """
     try:
         book_crud.add_book(book)
         return {"msg": "Success"}, 200
+    except sqlite3.IntegrityError as e:
+        raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 @router.put("/{book_id}")
 def editBook(book_id: str, book: Book) -> dict:
@@ -71,15 +83,23 @@ def editBook(book_id: str, book: Book) -> dict:
         book_id (str): The ID of the book to edit.
         book (Book): An instance of the Book class containing the updated book's details.
     Returns:
-        dict: A success message.
+        msg (dict): A success message.
     Raises:
-        HTTPException (500): If there is an issue with editing the book.
+        HTTPException (400): If the book ID is not a positive integer.
+        HTTPException (404): If the book is not found.
+        HTTPException (500): If any error occurs during editing of the book.
     """
     try:
         book_crud.edit_book(int(book_id), book)
         return {"msg": "Success"}, 200
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
 
 @router.delete("/{book_id}")
 def deleteBook(book_id: str) -> dict:
@@ -89,12 +109,20 @@ def deleteBook(book_id: str) -> dict:
     Parameters:
         book_id (str): The ID of the book to delete.
     Returns:
-        dict: A success message.
+        msg (dict): A success message.
     Raises:
-        HTTPException (500): If there is an issue with deleting the book.
+        HTTPException (400): If the book ID is not a positive integer.
+        HTTPException (404): If the book is not found.
+        HTTPException (500): If any error occurs during deleting of the book.
     """
     try:
         book_crud.delete_book(int(book_id))
         return {"msg": "Success"}, 200
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except KeyError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
