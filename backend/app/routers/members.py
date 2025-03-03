@@ -27,7 +27,7 @@ def getMembers() -> list:
         raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/{member_id}")
-def getMember(member_id: str) -> dict:
+def getMember(member_id: int) -> dict:
     """
     Retrieve a specific member from the database by their ID.
     Calls the get_member function from the member_crud module to fetch the member with the given ID and returns the result.
@@ -41,7 +41,7 @@ def getMember(member_id: str) -> dict:
         HTTPException (500): If any error occurs during fetching of the member.
     """
     try:
-        member = member_crud.get_member(int(member_id))
+        member = member_crud.get_member(member_id)
         return JSONResponse(content=member, status_code=200)
     except ValueError as valueError:
         raise HTTPException(status_code=400, detail=str(valueError))

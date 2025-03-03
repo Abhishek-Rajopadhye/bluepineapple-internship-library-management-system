@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText } from '@mui/material';
 import PropTypes from 'prop-types';
+import axios from 'axios';
 
 const MemberDetailsModal = ({ open, onClose, member }) => {
     const [allocations, setAllocations] = useState([]);
@@ -11,11 +12,11 @@ const MemberDetailsModal = ({ open, onClose, member }) => {
         if (member) {
             const fetchAllocations = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/allocations/member=${member.id}`);
-                if (!response.ok) {
+                const response = await axios.get(`http://localhost:8000/allocations/?member=${member.id.toString()}`);
+                if(response.status != 200){
                     throw new Error('Network response was not ok');
                 }
-                const data = await response.json();
+                const data = response.data;
                 setAllocations(data);
             } catch (error) {
                 setError(error.message);

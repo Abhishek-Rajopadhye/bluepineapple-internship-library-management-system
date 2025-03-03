@@ -21,8 +21,8 @@ function App() {
             <TopBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
             <Container className="Container">
                 <Routes>
-                <Route path="/books" element={<Books searchQuery={searchQuery} />} />
-                <Route path="/members" element={<Members searchQuery={searchQuery} />} />
+                    <Route path="/books" element={<Books searchQuery={searchQuery} />} />
+                    <Route path="/members" element={<Members searchQuery={searchQuery} />} />
                 </Routes>
             </Container>
             <BottomNav value={value} setValue={setValue} location={location} setLocation={setLocation}/>

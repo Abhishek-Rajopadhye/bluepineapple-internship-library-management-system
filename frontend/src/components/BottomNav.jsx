@@ -6,9 +6,6 @@ const BottomNav = ({ value, setValue, location, setLocation }) => {
   return (
     <BottomNavigation
       value={value}
-      onChange={(event, newValue) => {
-        setValue(newValue);
-      }}
       showLabels
       className="BottomNavigation"
     >

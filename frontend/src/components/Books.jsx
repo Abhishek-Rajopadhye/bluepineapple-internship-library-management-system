@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Assignment as AssignmentIcon } from '@mui/icons-material';
 import { BookDetailsModal } from './BookDetailsModal';
@@ -16,24 +17,23 @@ const Books = () => {
     const [openEdit, setOpenEdit] = useState(false);
     const [openAllocate, setOpenAllocate] = useState(false);
   
-    useEffect(() => {
-        const fetchBooks = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/books/');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setBooks(data);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
+    const fetchBooks = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/books/');
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
             }
-        };
+            const data = await response.json();
+            setBooks(data);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchBooks();
-
     }, []);
   
     const handleOpenDetails = (book) => {
@@ -76,18 +76,15 @@ const Books = () => {
   
     const handleAddBook = async (newBook) => {
         try {
-            const response = await fetch('http://localhost:8000/books/', {
-                method: 'POST',
+            const response = await axios.post('http://localhost:8000/books/', newBook, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newBook),
             });
-            if (!response.ok) {
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            const addedBook = await response.json();
-            setBooks((prevBooks) => [...prevBooks, addedBook]);
+            fetchBooks();
         } catch (error) {
             setError(error.message);
         }
@@ -95,20 +92,15 @@ const Books = () => {
   
     const handleEditBook = async (updatedBook) => {
         try {
-            const response = await fetch(`http://localhost:8000/books/${updatedBook.id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(updatedBook),
+            const response = await axios.put(`http://localhost:8000/books/${updatedBook.id}`, updatedBook, {
+            headers: {
+                'Content-Type': 'application/json',
+            },
             });
-            if (!response.ok) {
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            const editedBook = await response.json();
-            setBooks((prevBooks) =>
-                prevBooks.map((book) => (book.id === editedBook.id ? editedBook : book))
-            );
+            fetchBooks();
         } catch (error) {
             setError(error.message);
         }
@@ -116,20 +108,19 @@ const Books = () => {
   
     const handleAllocateBook = async (allocation) => {
         try {
-            const response = await fetch(`http://localhost:8000/allocations/book=${selectedBook.id}`, {
-                method: 'POST',
+            const response = await axios.post('http://localhost:8000/allocations/', {
+                ...allocation,
+                id: -1,
+                book_id: selectedBook.id,
+            }, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(allocation),
             });
-            if (!response.ok) {
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            const updatedBook = await response.json();
-            setBooks((prevBooks) =>
-                prevBooks.map((book) => (book.id === updatedBook.id ? updatedBook : book))
-            );
+            fetchBooks();
         } catch (error) {
             setError(error.message);
         }
@@ -137,13 +128,11 @@ const Books = () => {
   
     const handleDeleteBook = async (bookId) => {
         try {
-            const response = await fetch(`http://localhost:8000/books/${bookId}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
+            const response = await axios.delete(`http://localhost:8000/books/${bookId}`);
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            setBooks((prevBooks) => prevBooks.filter((book) => book.id !== bookId));
+            fetchBooks();
         } catch (error) {
             setError(error.message);
         }
@@ -184,13 +173,13 @@ const Books = () => {
                             <TableCell>{book.total_copies}</TableCell>
                             <TableCell>{book.allocated_copies}</TableCell>
                             <TableCell>
-                                <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEdit(book); }}>
+                                <IconButton onClick={(event) => { event.stopPropagation(); handleOpenEdit(book); }}>
                                     <EditIcon />
                                 </IconButton>
-                                <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteBook(book.id); }}>
+                                <IconButton onClick={(event) => { event.stopPropagation(); handleDeleteBook(book.id); }}>
                                     <DeleteIcon />
                                 </IconButton>
-                                <IconButton onClick={(e) => { e.stopPropagation(); handleOpenAllocate(book); }}>
+                                <IconButton onClick={(event) => { event.stopPropagation(); handleOpenAllocate(book); }}>
                                     <AssignmentIcon />
                                 </IconButton>
                             </TableCell>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText } from '@mui/material';
 import PropTypes from 'prop-types';
 
@@ -6,56 +7,71 @@ const BookDetailsModal = ({ open, onClose, book }) => {
     const [allocations, setAllocations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-  
+
     useEffect(() => {
         if (book) {
-            const fetchAllocations = async () => {
+        const fetchAllocations = async () => {
             try {
-                const response = await fetch(`http://localhost:8000/allocations/book=${book.id}`);
-                if (!response.ok) {
+            const response = await axios.get(`http://localhost:8000/allocations/?book=${book.id.toString()}`);
+            if (response.status !== 200) {
+                throw new Error('Network response was not ok');
+            }
+            const data = response.data;
+
+            // Fetch member details for each allocation
+            const allocationsWithMemberNames = await Promise.all(
+                data.map(async (allocation) => {
+                const memberResponse = await axios.get(`http://localhost:8000/members/${allocation.member_id}`);
+                if (memberResponse.status !== 200) {
                     throw new Error('Network response was not ok');
                 }
-                const data = await response.json();
-                setAllocations(data);
+                return {
+                    ...allocation,
+                    member_name: memberResponse.data.name,
+                };
+                })
+            );
+
+            setAllocations(allocationsWithMemberNames);
             } catch (error) {
-                setError(error.message);
+            setError(error.message);
             } finally {
-                setLoading(false);
+            setLoading(false);
             }
-            };
-    
-            fetchAllocations();
+        };
+
+        fetchAllocations();
         }
     }, [book]);
-  
+
     return (
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>Book Details</DialogTitle>
             <DialogContent>
                 {book && (
-                    <>
+                <>
                     <Typography variant="h6">{book.name}</Typography>
                     <Typography variant="subtitle1">{book.author}</Typography>
                     <Typography variant="body2">Total Copies: {book.total_copies}</Typography>
                     <Typography variant="body2">Allocated Copies: {book.allocated_copies}</Typography>
                     <Typography variant="h6" style={{ marginTop: '16px' }}>Allocations</Typography>
                     {loading ? (
-                        <Typography>Loading...</Typography>
+                    <Typography>Loading...</Typography>
                     ) : error ? (
-                        <Typography color="error">{error}</Typography>
+                    <Typography color="error">{error}</Typography>
                     ) : (
-                        <List>
+                    <List>
                         {allocations.map((allocation) => (
-                            <ListItem key={allocation.id}>
+                        <ListItem key={allocation.id}>
                             <ListItemText
-                                primary={`Member ID: ${allocation.member_id}`}
-                                secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
+                            primary={`Member: ${allocation.member_name}`}
+                            secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
                             />
-                            </ListItem>
+                        </ListItem>
                         ))}
-                        </List>
+                    </List>
                     )}
-                    </>
+                </>
                 )}
             </DialogContent>
             <DialogActions>
@@ -66,7 +82,7 @@ const BookDetailsModal = ({ open, onClose, book }) => {
         </Dialog>
     );
 };
-  
+
 BookDetailsModal.propTypes = {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,

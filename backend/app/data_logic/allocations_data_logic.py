@@ -130,6 +130,7 @@ def add_allocation(allocation: Allocation):
         cursor = conn.cursor()
         cursor.execute("INSERT INTO Allocations (book_id, member_id, start_date, end_date, returned, overdue) VALUES (?, ?, ?, ?, ?, ?);",
                        (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue))
+        cursor.execute("UPDATE Books SET allocated_copies = allocated_copies + 1 WHERE id=?;", (allocation.book_id,))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:

@@ -35,14 +35,14 @@ const EditBookModal = ({ open, onClose, book, onSave }) => {
                 fullWidth
                 margin="normal"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(event) => setName(event.target.value)}
             />
             <TextField
                 label="Author"
                 fullWidth
                 margin="normal"
                 value={author}
-                onChange={(e) => setAuthor(e.target.value)}
+                onChange={(event) => setAuthor(event.target.value)}
             />
             <TextField
                 label="Total Copies"
@@ -50,7 +50,7 @@ const EditBookModal = ({ open, onClose, book, onSave }) => {
                 fullWidth
                 margin="normal"
                 value={totalCopies}
-                onChange={(e) => setTotalCopies(e.target.value)}
+                onChange={(event) => setTotalCopies(event.target.value)}
             />
             </DialogContent>
             <DialogActions>
@@ -69,6 +69,7 @@ EditBookModal.propTypes = {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     book: PropTypes.shape({
+        id: PropTypes.number,
         name: PropTypes.string,
         author: PropTypes.string,
         total_copies: PropTypes.number,

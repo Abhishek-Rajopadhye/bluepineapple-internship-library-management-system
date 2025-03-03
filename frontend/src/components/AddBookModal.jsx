@@ -9,6 +9,7 @@ const AddBookModal = ({ open, onClose, onAdd }) => {
   
     const handleAdd = () => {
         const newBook = {
+            id:-1,
             name,
             author,
             total_copies: parseInt(totalCopies, 10),
@@ -27,14 +28,14 @@ const AddBookModal = ({ open, onClose, onAdd }) => {
                 fullWidth
                 margin="normal"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(event) => setName(event.target.value)}
                 />
                 <TextField
                 label="Author"
                 fullWidth
                 margin="normal"
                 value={author}
-                onChange={(e) => setAuthor(e.target.value)}
+                onChange={(event) => setAuthor(event.target.value)}
                 />
                 <TextField
                 label="Total Copies"
@@ -42,7 +43,7 @@ const AddBookModal = ({ open, onClose, onAdd }) => {
                 fullWidth
                 margin="normal"
                 value={totalCopies}
-                onChange={(e) => setTotalCopies(e.target.value)}
+                onChange={(event) => setTotalCopies(event.target.value)}
                 />
             </DialogContent>
             <DialogActions>

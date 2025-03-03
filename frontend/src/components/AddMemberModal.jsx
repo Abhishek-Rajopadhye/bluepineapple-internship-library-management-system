@@ -9,6 +9,7 @@ const AddMemberModal = ({ open, onClose, onAdd }) => {
   
     const handleAdd = () => {
         const newMember = {
+            id:-1,
             name,
             email,
             phone,

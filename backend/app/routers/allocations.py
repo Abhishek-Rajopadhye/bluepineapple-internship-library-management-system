@@ -52,8 +52,8 @@ def getAllocation(allocation_id: str) -> dict:
     except Exception as exception:
         raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
-@router.get("/book={book_id}")
-def getAllocationsOfBook(book_id: str) -> list:
+@router.get("/?book={book_id}")
+def getAllocationsOfBook(book_id: int) -> list:
     """
     Retrieve all allocations for a specific book from the database.
     Calls the get_allocations_of_book function from the allocation_crud module to fetch all allocations for the given book ID and returns the result.
@@ -66,7 +66,7 @@ def getAllocationsOfBook(book_id: str) -> list:
         HTTPException (500): If any error occurs during fetching of allocations.
     """
     try:
-        allocations = allocation_crud.get_allocations_of_book(int(book_id))
+        allocations = allocation_crud.get_allocations_of_book(book_id)
         return JSONResponse(content=allocations, status_code=200)
     except ValueError as valueError:
         raise HTTPException(status_code=400, detail=str(valueError))
@@ -75,8 +75,8 @@ def getAllocationsOfBook(book_id: str) -> list:
     except Exception as exception:
         raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
-@router.get("/member={member_id}")
-def getAllocationsOfMember(member_id: str) -> list:
+@router.get("/?member={member_id}")
+def getAllocationsOfMember(member_id) -> list:
     """
     Retrieve all allocations for a specific member from the database.
     Calls the get_allocations_of_member function from the allocation_crud module to fetch all allocations for the given member ID and returns the result.
@@ -90,7 +90,8 @@ def getAllocationsOfMember(member_id: str) -> list:
         HTTPException (500): If any error occurs during fetching of allocations.
     """
     try:
-        allocations = allocation_crud.get_allocations_of_member(int(member_id))
+        print(member_id, type(member_id))
+        allocations = allocation_crud.get_allocations_of_member(member_id)
         return JSONResponse(content=allocations, status_code=200)
     except ValueError as valueError:
         raise HTTPException(status_code=400, detail=str(valueError))
@@ -99,7 +100,7 @@ def getAllocationsOfMember(member_id: str) -> list:
     except Exception as exception:
         raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
-@router.get("/book={book_id}&member={member_id}")
+@router.get("/?book={book_id}&member={member_id}")
 def getAllocationByBookAndMember(book_id: str, member_id: str) -> dict:
     """
     Retrieve a specific allocation for a book and member from the database.

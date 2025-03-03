@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { MemberDetailsModal } from './MemberDetailsModal';
@@ -14,22 +15,22 @@ const Members = () => {
     const [openAdd, setOpenAdd] = useState(false);
     const [openEdit, setOpenEdit] = useState(false);
   
-    useEffect(() => {
-        const fetchMembers = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/members/');
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                setMembers(data);
-            } catch (error) {
-                setError(error.message);
-            } finally {
-                setLoading(false);
+    const fetchMembers = async () => {
+        try {
+            const response = await axios.get('http://localhost:8000/members/');
+            if (response.status != 200) {
+                throw new Error('Network response was not ok');
             }
-        };
-    
+            const { data } = await axios.get('http://localhost:8000/members/');
+            setMembers(data);
+        } catch (error) {
+            setError(error.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
         fetchMembers();
     }, []);
   
@@ -63,18 +64,15 @@ const Members = () => {
   
     const handleAddMember = async (newMember) => {
         try {
-            const response = await fetch('http://localhost:8000/members/', {
-                method: 'POST',
+            const response = await axios.post('http://localhost:8000/members/', newMember, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(newMember),
             });
-            if (!response.ok) {
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            const addedMember = await response.json();
-            setMembers((prevMembers) => [...prevMembers, addedMember]);
+            fetchMembers();
         } catch (error) {
             setError(error.message);
         }
@@ -82,20 +80,15 @@ const Members = () => {
 
     const handleEditMember = async (updatedMember) => {
         try {
-            const response = await fetch(`http://localhost:8000/members/${updatedMember.id}`, {
-                method: 'PUT',
+            const response = await axios.put(`http://localhost:8000/members/${updatedMember.id}`, updatedMember, {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(updatedMember),
             });
-            if (!response.ok) {
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            const editedMember = await response.json();
-            setMembers((prevMembers) =>
-                prevMembers.map((member) => (member.id === editedMember.id ? editedMember : member))
-            );
+            fetchMembers();
         } catch (error) {
             setError(error.message);
         }
@@ -104,13 +97,11 @@ const Members = () => {
   
     const handleDeleteMember = async (memberId) => {
         try {
-            const response = await fetch(`http://localhost:8000/members/${memberId}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) {
+            const response = await axios.delete(`http://localhost:8000/members/${memberId}`);
+            if (response.status != 200) {
                 throw new Error('Network response was not ok');
             }
-            setMembers((prevMembers) => prevMembers.filter((member) => member.id !== memberId));
+            fetchMembers();
         } catch (error) {
             setError(error.message);
         }
@@ -139,7 +130,6 @@ const Members = () => {
                         <TableCell>Name</TableCell>
                         <TableCell>Email</TableCell>
                         <TableCell>Phone Number</TableCell>
-                        <TableCell>Number of Allocated Books</TableCell>
                         <TableCell>Actions</TableCell>
                     </TableRow>
                     </TableHead>
@@ -149,12 +139,11 @@ const Members = () => {
                                 <TableCell>{member.name}</TableCell>
                                 <TableCell>{member.email}</TableCell>
                                 <TableCell>{member.phone}</TableCell>
-                                <TableCell>{member.allocated_books}</TableCell>
                                 <TableCell>
-                                    <IconButton onClick={(e) => { e.stopPropagation(); handleOpenEdit(member); }}>
+                                    <IconButton onClick={(event) => { event.stopPropagation(); handleOpenEdit(member); }}>
                                         <EditIcon />
                                     </IconButton>
-                                    <IconButton onClick={(e) => { e.stopPropagation(); handleDeleteMember(member.id); }}>
+                                    <IconButton onClick={(event) => { event.stopPropagation(); handleDeleteMember(member.id); }}>
                                         <DeleteIcon />
                                     </IconButton>
                                 </TableCell>
