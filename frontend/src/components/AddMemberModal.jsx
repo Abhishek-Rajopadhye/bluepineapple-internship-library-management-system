@@ -21,35 +21,35 @@ const AddMemberModal = ({ open, onClose, onAdd }) => {
         <Dialog open={open} onClose={onClose}>
             <DialogTitle>Add New Member</DialogTitle>
             <DialogContent>
-            <TextField
-                label="Name"
-                fullWidth
-                margin="normal"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-            />
-            <TextField
-                label="Email"
-                fullWidth
-                margin="normal"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-            />
-            <TextField
-                label="Phone Number"
-                fullWidth
-                margin="normal"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-            />
+                <TextField
+                    label="Name"
+                    fullWidth
+                    margin="normal"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                />
+                <TextField
+                    label="Email"
+                    fullWidth
+                    margin="normal"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+                <TextField
+                    label="Phone Number"
+                    fullWidth
+                    margin="normal"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                />
             </DialogContent>
             <DialogActions>
-            <Button onClick={onClose} color="primary">
-                Cancel
-            </Button>
-            <Button onClick={handleAdd} color="primary">
-                Add
-            </Button>
+                <Button onClick={onClose} color="primary">
+                    Cancel
+                </Button>
+                <Button onClick={handleAdd} color="primary">
+                    Add
+                </Button>
             </DialogActions>
         </Dialog>
     );

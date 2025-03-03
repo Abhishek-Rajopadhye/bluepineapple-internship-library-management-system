@@ -58,9 +58,9 @@ const AllocateBookModal = ({ open, onClose, onAllocate }) => {
 };
 
 AllocateBookModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onAllocate: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onAllocate: PropTypes.func.isRequired,
 };
 
 export { AllocateBookModal };

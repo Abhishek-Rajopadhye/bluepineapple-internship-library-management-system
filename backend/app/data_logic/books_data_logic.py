@@ -141,6 +141,7 @@ def edit_book(book_id:int, book: Book):
             raise KeyError("Book not found")
         
         cursor.execute("UPDATE Books SET name=?, author=?, total_copies=?, allocated_copies=? WHERE id=?;", (book.name, book.author, book.total_copies, book.allocated_copies, book_id))
+
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
@@ -165,7 +166,10 @@ def delete_book(book_id: int):
     try:
         if(book_id <= 0):
             raise ValueError("Book ID must be a positive integer")
-
+        
+        if book['allocated_copies'] > 0:
+            raise Exception("Cannot delete a book that has been allocated")
+        
         conn = get_db_connection()
         cursor = conn.cursor()
         book = conn.execute("SELECT * FROM Books WHERE id=?;", (book_id,)).fetchone()

@@ -66,14 +66,14 @@ const EditBookModal = ({ open, onClose, book, onSave }) => {
 };  
 
 EditBookModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  book: PropTypes.shape({
-    name: PropTypes.string,
-    author: PropTypes.string,
-    total_copies: PropTypes.number,
-  }),
-  onSave: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    book: PropTypes.shape({
+        name: PropTypes.string,
+        author: PropTypes.string,
+        total_copies: PropTypes.number,
+    }),
+    onSave: PropTypes.func.isRequired,
 };
 
 export { EditBookModal };

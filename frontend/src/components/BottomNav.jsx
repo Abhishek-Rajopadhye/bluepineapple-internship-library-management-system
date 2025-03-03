@@ -33,8 +33,8 @@ const BottomNav = ({ value, setValue }) => {
 };
 
 BottomNav.propTypes = {
-  value: PropTypes.number.isRequired,
-  setValue: PropTypes.func.isRequired,
+    value: PropTypes.number.isRequired,
+    setValue: PropTypes.func.isRequired,
 };
 
 export { BottomNav };

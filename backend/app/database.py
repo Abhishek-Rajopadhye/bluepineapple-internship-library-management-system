@@ -75,7 +75,7 @@ def init_db():
             returned BOOLEAN DEFAULT FALSE,
             overdue BOOLEAN DEFAULT FALSE,
             FOREIGN KEY (book_id) REFERENCES Books(id),
-            FOREIGN KEY (member_id) REFERENCES Members(id)
+            FOREIGN KEY (member_id) REFERENCES Members(id),
         );
         """)
 

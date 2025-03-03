@@ -68,15 +68,15 @@ const BookDetailsModal = ({ open, onClose, book }) => {
 };
   
 BookDetailsModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  book: PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    name: PropTypes.string,
-    author: PropTypes.string,
-    total_copies: PropTypes.number,
-    allocated_copies: PropTypes.number,
-  }),
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    book: PropTypes.shape({
+        id: PropTypes.number.isRequired,
+        name: PropTypes.string,
+        author: PropTypes.string,
+        total_copies: PropTypes.number,
+        allocated_copies: PropTypes.number,
+    }),
 };
 
 export { BookDetailsModal };

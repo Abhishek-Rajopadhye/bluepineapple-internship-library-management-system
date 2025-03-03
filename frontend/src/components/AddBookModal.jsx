@@ -58,9 +58,9 @@ const AddBookModal = ({ open, onClose, onAdd }) => {
 };
 
 AddBookModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onAdd: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    onAdd: PropTypes.func.isRequired,
 };
 
 export { AddBookModal };

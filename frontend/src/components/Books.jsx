@@ -33,7 +33,7 @@ const Books = () => {
         };
 
         fetchBooks();
-        
+
     }, []);
   
     const handleOpenDetails = (book) => {
@@ -77,14 +77,14 @@ const Books = () => {
     const handleAddBook = async (newBook) => {
         try {
             const response = await fetch('http://localhost:8000/books/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(newBook),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newBook),
             });
             if (!response.ok) {
-            throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok');
             }
             const addedBook = await response.json();
             setBooks((prevBooks) => [...prevBooks, addedBook]);
@@ -96,18 +96,18 @@ const Books = () => {
     const handleEditBook = async (updatedBook) => {
         try {
             const response = await fetch(`http://localhost:8000/books/${updatedBook.id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updatedBook),
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(updatedBook),
             });
             if (!response.ok) {
-            throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok');
             }
             const editedBook = await response.json();
             setBooks((prevBooks) =>
-            prevBooks.map((book) => (book.id === editedBook.id ? editedBook : book))
+                prevBooks.map((book) => (book.id === editedBook.id ? editedBook : book))
             );
         } catch (error) {
             setError(error.message);
@@ -117,18 +117,18 @@ const Books = () => {
     const handleAllocateBook = async (allocation) => {
         try {
             const response = await fetch(`http://localhost:8000/allocations/book=${selectedBook.id}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(allocation),
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(allocation),
             });
             if (!response.ok) {
-            throw new Error('Network response was not ok');
+                throw new Error('Network response was not ok');
             }
             const updatedBook = await response.json();
             setBooks((prevBooks) =>
-            prevBooks.map((book) => (book.id === updatedBook.id ? updatedBook : book))
+                prevBooks.map((book) => (book.id === updatedBook.id ? updatedBook : book))
             );
         } catch (error) {
             setError(error.message);
@@ -168,13 +168,13 @@ const Books = () => {
             <TableContainer component={Paper} style={{ marginTop: '16px' }}>
                 <Table>
                     <TableHead>
-                    <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Author</TableCell>
-                        <TableCell>Total Copies</TableCell>
-                        <TableCell>Allocated Copies</TableCell>
-                        <TableCell>Actions</TableCell>
-                    </TableRow>
+                        <TableRow>
+                            <TableCell>Name</TableCell>
+                            <TableCell>Author</TableCell>
+                            <TableCell>Total Copies</TableCell>
+                            <TableCell>Allocated Copies</TableCell>
+                            <TableCell>Actions</TableCell>
+                        </TableRow>
                     </TableHead>
                     <TableBody>
                     {books.map((book) => (

@@ -37,7 +37,7 @@ const MemberDetailsModal = ({ open, onClose, member }) => {
                     <Typography variant="h6">{member.name}</Typography>
                     <Typography variant="subtitle1">{member.email}</Typography>
                     <Typography variant="body2">Phone Number: {member.phone}</Typography>
-                    <Typography variant="body2">Number of Allocated Books: {member.allocated_books}</Typography>
+                    <Typography variant="body2">Number of Allocated Books: {allocations.length}</Typography>
                     <Typography variant="h6" style={{ marginTop: '16px' }}>Allocations</Typography>
                     {loading ? (
                         <Typography>Loading...</Typography>
@@ -68,15 +68,14 @@ const MemberDetailsModal = ({ open, onClose, member }) => {
 };
   
 MemberDetailsModal.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  member: PropTypes.shape({
-    id: PropTypes.number,
-    name: PropTypes.string,
-    email: PropTypes.string,
-    phone: PropTypes.string,
-    allocated_books: PropTypes.number,
-  }),
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    member: PropTypes.shape({
+        id: PropTypes.number,
+        name: PropTypes.string,
+        email: PropTypes.string,
+        phone: PropTypes.string,
+    }),
 };
 
 export { MemberDetailsModal };

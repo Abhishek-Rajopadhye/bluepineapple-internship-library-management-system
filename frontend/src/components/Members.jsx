@@ -44,7 +44,7 @@ const Members = () => {
     };
   
     const handleOpenAdd = () => {
-      setOpenAdd(true);
+        setOpenAdd(true);
     };
   
     const handleCloseAdd = () => {
