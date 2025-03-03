@@ -9,9 +9,9 @@ const AddMemberModal = ({ open, onClose, onAdd }) => {
   
     const handleAdd = () => {
         const newMember = {
-        name,
-        email,
-        phone,
+            name,
+            email,
+            phone,
         };
         onAdd(newMember);
         onClose();

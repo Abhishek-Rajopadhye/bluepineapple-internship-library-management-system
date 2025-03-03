@@ -2,7 +2,7 @@ import { BottomNavigation, BottomNavigationAction } from '@mui/material';
 import { Book as BookIcon, People as PeopleIcon } from '@mui/icons-material';
 import PropTypes from 'prop-types';
 
-const BottomNav = ({ value, setValue }) => {
+const BottomNav = ({ value, setValue, location, setLocation }) => {
   return (
     <BottomNavigation
       value={value}
@@ -14,17 +14,19 @@ const BottomNav = ({ value, setValue }) => {
     >
       <BottomNavigationAction 
         label="Books" 
-        icon={<BookIcon />} 
+        icon={<BookIcon color={location == "books" ? "primary" : "disabled" } />} 
         onClick={() => {
           setValue(0);
+          setLocation("books")
           window.location.href = '/books';
-        }} 
+        }}
       />
       <BottomNavigationAction 
         label="Members" 
-        icon={<PeopleIcon />} 
+        icon={<PeopleIcon color={location == "members" ? "primary" : "disabled" } />} 
         onClick={() => {
           setValue(1);
+          setLocation("members")
           window.location.href = '/members';
         }} 
       />
@@ -35,6 +37,8 @@ const BottomNav = ({ value, setValue }) => {
 BottomNav.propTypes = {
     value: PropTypes.number.isRequired,
     setValue: PropTypes.func.isRequired,
+    location: PropTypes.string.isRequired,
+    setLocation: PropTypes.func.isRequired
 };
 
 export { BottomNav };
