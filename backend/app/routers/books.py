@@ -21,10 +21,10 @@ def getBooks() -> list:
     try:
         books = book_crud.get_all_books()
         return JSONResponse(content=books, status_code=200)
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/{book_id}")
 def getBook(book_id: str) -> dict:
@@ -43,14 +43,37 @@ def getBook(book_id: str) -> dict:
     try:
         book = book_crud.get_book(int(book_id))
         return JSONResponse(content=book, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as bookNotFound:
+        raise HTTPException(status_code=404, detail=str(bookNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
+
+@router.get("/name={book_name}")
+def getBookByName(book_name: str) -> dict:
+    """
+    Retrieve a specific book from the database by its name.
+    Calls the get_book_by_name function from the book_crud module to fetch the book with the given name and returns the result.
+    Parameters:
+        book_name (str): The name of the book to retrieve.
+    Returns:
+        book (dict): A dictionary representing the book.
+    Raises:
+        HTTPException (404): If the book is not found.
+        HTTPException (500): If any error occurs during fetching of the book.
+    """
+    try:
+        book = book_crud.get_book_by_name(book_name)
+        return JSONResponse(content=book, status_code=200)
+    except KeyError as bookNotFound:
+        raise HTTPException(status_code=404, detail=str(bookNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.post("/")
 def addBook(book: Book) -> dict:
@@ -68,12 +91,12 @@ def addBook(book: Book) -> dict:
     try:
         book_crud.add_book(book)
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except sqlite3.IntegrityError as duplicateError:
+        raise HTTPException(status_code=400, detail=f"Integrity error: {duplicateError}")
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.put("/{book_id}")
 def editBook(book_id: str, book: Book) -> dict:
@@ -93,14 +116,14 @@ def editBook(book_id: str, book: Book) -> dict:
     try:
         book_crud.edit_book(int(book_id), book)
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as bookNotFound:
+        raise HTTPException(status_code=404, detail=str(bookNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.delete("/{book_id}")
 def deleteBook(book_id: str) -> dict:
@@ -119,11 +142,11 @@ def deleteBook(book_id: str) -> dict:
     try:
         book_crud.delete_book(int(book_id))
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as bookNotFound:
+        raise HTTPException(status_code=404, detail=str(bookNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")

@@ -21,10 +21,10 @@ def getAllocations() -> list:
     try:
         allocations = allocation_crud.get_all_allocation()
         return JSONResponse(content=allocations, status_code=200)
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/{allocation_id}")
 def getAllocation(allocation_id: str) -> dict:
@@ -43,14 +43,14 @@ def getAllocation(allocation_id: str) -> dict:
     try:
         allocation = allocation_crud.get_allocation(int(allocation_id))
         return JSONResponse(content=allocation, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as allocationNotFound:
+        raise HTTPException(status_code=404, detail=str(allocationNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/book={book_id}")
 def getAllocationsOfBook(book_id: str) -> list:
@@ -68,12 +68,12 @@ def getAllocationsOfBook(book_id: str) -> list:
     try:
         allocations = allocation_crud.get_allocations_of_book(int(book_id))
         return JSONResponse(content=allocations, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/member={member_id}")
 def getAllocationsOfMember(member_id: str) -> list:
@@ -92,12 +92,12 @@ def getAllocationsOfMember(member_id: str) -> list:
     try:
         allocations = allocation_crud.get_allocations_of_member(int(member_id))
         return JSONResponse(content=allocations, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/book={book_id}&member={member_id}")
 def getAllocationByBookAndMember(book_id: str, member_id: str) -> dict:
@@ -117,14 +117,14 @@ def getAllocationByBookAndMember(book_id: str, member_id: str) -> dict:
     try:
         allocation = allocation_crud.get_allocation_by_book_and_member(int(book_id), int(member_id))
         return JSONResponse(content=allocation, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as allocationNotFound:
+        raise HTTPException(status_code=404, detail=str(allocationNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.post("/")
 def addAllocation(allocation: Allocation) -> dict:
@@ -142,12 +142,12 @@ def addAllocation(allocation: Allocation) -> dict:
     try:
         allocation_crud.add_allocation(allocation)
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except sqlite3.IntegrityError as duplicateError:
+        raise HTTPException(status_code=400, detail=f"Integrity error: {duplicateError}")
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.put("/{allocation_id}")
 def editAllocation(allocation_id: str, allocation: Allocation) -> dict:
@@ -167,14 +167,14 @@ def editAllocation(allocation_id: str, allocation: Allocation) -> dict:
     try:
         allocation_crud.edit_allocation(int(allocation_id), allocation)
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as allocationNotFound:
+        raise HTTPException(status_code=404, detail=str(allocationNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.delete("/{allocation_id}")
 def deleteAllocation(allocation_id: str) -> dict:
@@ -193,11 +193,11 @@ def deleteAllocation(allocation_id: str) -> dict:
     try:
         allocation_crud.delete_allocation(int(allocation_id))
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as allocationNotFound:
+        raise HTTPException(status_code=404, detail=str(allocationNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")

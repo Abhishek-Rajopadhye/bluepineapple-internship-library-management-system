@@ -21,10 +21,10 @@ def getMembers() -> list:
     try:
         members = member_crud.get_all_members()
         return JSONResponse(content=members, status_code=200)
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.get("/{member_id}")
 def getMember(member_id: str) -> dict:
@@ -43,14 +43,37 @@ def getMember(member_id: str) -> dict:
     try:
         member = member_crud.get_member(int(member_id))
         return JSONResponse(content=member, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as memberNotFound:
+        raise HTTPException(status_code=404, detail=str(memberNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
+
+@router.get("/name={member_name}")
+def getMemberByName(member_name: str) -> dict:
+    """
+    Retrieve a specific member from the database by their name.
+    Calls the get_member_by_name function from the member_crud module to fetch the member with the given name and returns the result.
+    Parameters:
+        member_name (str): The name of the member to retrieve.
+    Returns:
+        member (dict): A dictionary representing the member.
+    Raises:
+        HTTPException (404): If the member is not found.
+        HTTPException (500): If any error occurs during fetching of the member.
+    """
+    try:
+        member = member_crud.get_member_by_name(member_name)
+        return JSONResponse(content=member, status_code=200)
+    except KeyError as memberNotFound:
+        raise HTTPException(status_code=404, detail=str(memberNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.post("/")
 def addMember(member: Member) -> dict:
@@ -68,12 +91,12 @@ def addMember(member: Member) -> dict:
     try:
         member_crud.add_member(member)
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except sqlite3.IntegrityError as e:
-        raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except sqlite3.IntegrityError as duplicateError:
+        raise HTTPException(status_code=400, detail=f"Integrity error: {duplicateError}")
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.put("/{member_id}")
 def editMember(member_id: str, member: Member) -> dict:
@@ -93,14 +116,14 @@ def editMember(member_id: str, member: Member) -> dict:
     try:
         member_crud.edit_member(int(member_id), member)
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as memberNotFound:
+        raise HTTPException(status_code=404, detail=str(memberNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
 @router.delete("/{member_id}")
 def deleteMember(member_id: str) -> dict:
@@ -119,11 +142,11 @@ def deleteMember(member_id: str) -> dict:
     try:
         member_crud.delete_member(int(member_id))
         return JSONResponse(content={"msg": "Success"}, status_code=200)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except KeyError as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    except sqlite3.Error as e:
-        raise HTTPException(status_code=500, detail=f"Database error: {e}")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    except ValueError as valueError:
+        raise HTTPException(status_code=400, detail=str(valueError))
+    except KeyError as memberNotFound:
+        raise HTTPException(status_code=404, detail=str(memberNotFound))
+    except sqlite3.Error as databaseError:
+        raise HTTPException(status_code=500, detail=f"Database error: {databaseError}")
+    except Exception as exception:
+        raise HTTPException(status_code=500, detail=f"Error: {exception}")
