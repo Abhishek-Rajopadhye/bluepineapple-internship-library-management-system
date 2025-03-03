@@ -124,12 +124,12 @@ def edit_member(member_id:int, member: Member):
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        member = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
+        existingMember = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
         
-        if(not member):
+        if(not existingMember):
             raise KeyError("Member not found")
         
-        cursor.execute("UPDATE Members SET name=?, email=?, phone=? WHERE id=?;", (member.name, member.email, member.phone, member.id))
+        cursor.execute("UPDATE Members SET name=?, email=?, phone=? WHERE id=?;", (member.name, member.email, member.phone, member_id))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:
@@ -154,10 +154,15 @@ def delete_member(member_id: int):
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        member = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
+        existingMember = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
         
-        if(not member):
+        if(not existingMember):
             raise KeyError("Member not found")
+        
+        activeAllocations = conn.execute("SELECT * FROM Allocations WHERE member_id=?;", (member_id,)).fetchall()
+        
+        if(activeAllocations):
+            raise Exception("Member has active allocations and cannot be deleted")
         
         cursor.execute("DELETE FROM Members WHERE id=?;", (member_id,))
         

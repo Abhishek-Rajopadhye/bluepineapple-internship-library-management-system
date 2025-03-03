@@ -7,68 +7,83 @@ const MemberDetailsModal = ({ open, onClose, member }) => {
     const [allocations, setAllocations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-  
+
     useEffect(() => {
         if (member) {
-            const fetchAllocations = async () => {
+        const fetchAllocations = async () => {
             try {
-                const response = await axios.get(`http://localhost:8000/allocations/?member=${member.id.toString()}`);
-                if(response.status != 200){
+            const response = await axios.get(`http://localhost:8000/allocations/?member=${member.id.toString()}`);
+            if (response.status !== 200) {
+                throw new Error('Network response was not ok');
+            }
+            const data = response.data;
+
+            // Fetch book details for each allocation
+            const allocationsWithBookNames = await Promise.all(
+                data.map(async (allocation) => {
+                const bookResponse = await axios.get(`http://localhost:8000/books/${allocation.book_id}`);
+                if (bookResponse.status !== 200) {
                     throw new Error('Network response was not ok');
                 }
-                const data = response.data;
-                setAllocations(data);
+                return {
+                    ...allocation,
+                    book_name: bookResponse.data.name,
+                };
+                })
+            );
+
+            setAllocations(allocationsWithBookNames);
             } catch (error) {
-                setError(error.message);
+            setError(error.message);
             } finally {
-                setLoading(false);
+            setLoading(false);
             }
-            };
-    
-            fetchAllocations();
+        };
+
+        fetchAllocations();
         }
     }, [member]);
-  
+
     return (
         <Dialog open={open} onClose={onClose}>
-            <DialogTitle>Member Details</DialogTitle>
-            <DialogContent>
-                {member && (
-                    <>
-                    <Typography variant="h6">{member.name}</Typography>
-                    <Typography variant="subtitle1">{member.email}</Typography>
-                    <Typography variant="body2">Phone Number: {member.phone}</Typography>
-                    <Typography variant="body2">Number of Allocated Books: {allocations.length}</Typography>
-                    <Typography variant="h6" style={{ marginTop: '16px' }}>Allocations</Typography>
-                    {loading ? (
-                        <Typography>Loading...</Typography>
-                    ) : error ? (
-                        <Typography color="error">{error}</Typography>
-                    ) : (
-                        <List>
-                        {allocations.map((allocation) => (
-                            <ListItem key={allocation.id}>
-                            <ListItemText
-                                primary={`Book ID: ${allocation.book_id}`}
-                                secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
-                            />
-                            </ListItem>
-                        ))}
-                        </List>
-                    )}
-                    </>
+        <DialogTitle>Member Details</DialogTitle>
+        <DialogContent>
+            {member && (
+            <>
+                <Typography variant="h6">{member.name}</Typography>
+                <Typography variant="subtitle1">{member.email}</Typography>
+                <Typography variant="body2">Phone Number: {member.phone}</Typography>
+                <Typography variant="body2">Number of Allocated Books: {allocations.length}</Typography>
+                <Typography variant="h6" style={{ marginTop: '16px' }}>Allocations</Typography>
+                {loading ? (
+                <Typography>Loading...</Typography>
+                ) : error ? (
+                <Typography color="error">{error}</Typography>
+                ) : (
+                <List>
+                    {allocations.map((allocation) => (
+                    <ListItem key={allocation.id}>
+                        <ListItemText
+                        primary={`Book: ${allocation.book_name}`}
+                        secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
+                        />
+                    </ListItem>
+                    ))}
+                </List>
                 )}
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="primary">
-                    Close
-                </Button>
-            </DialogActions>
+            </>
+            )}
+        </DialogContent>
+        <DialogActions>
+            <Button onClick={onClose} color="primary">
+            Close
+            </Button>
+        </DialogActions>
         </Dialog>
     );
-};
-  
-MemberDetailsModal.propTypes = {
+    };
+
+    MemberDetailsModal.propTypes = {
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
     member: PropTypes.shape({
