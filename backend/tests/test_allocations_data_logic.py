@@ -81,3 +81,29 @@ def test_get_allocation_with_negative_id(test_db):
 def test_delete_nonexistent_allocation(test_db):
     with pytest.raises(KeyError):
         delete_allocation(99)
+
+# Additional rigorous test cases
+def test_add_allocation_past_dates(test_db):
+    with pytest.raises(Exception):
+        allocation = Allocation(id=1, book_id=1, member_id=1, start_date="2000-01-01", end_date="2000-01-05", returned=False, overdue=False)
+        add_allocation(allocation)
+
+def test_add_allocation_large_id_numbers(test_db):
+    allocation = Allocation(id=99999, book_id=99999, member_id=99999, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)
+    add_allocation(allocation)
+    result = get_allocation(99999)
+    assert result["id"] == 99999
+
+def test_edit_allocation_invalid_values(test_db):
+    allocation = Allocation(id=1, book_id=1, member_id=1, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)
+    add_allocation(allocation)
+    with pytest.raises(ValueError):
+        updated_allocation = Allocation(id=1, book_id=-1, member_id=-1, start_date="invalid", end_date="invalid", returned=True, overdue=False)
+        edit_allocation(1, updated_allocation)
+
+def test_delete_allocation_with_dependencies(test_db, monkeypatch):
+    allocation = Allocation(id=1, book_id=1, member_id=1, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)
+    add_allocation(allocation)
+    monkeypatch.setattr("app.data_logic.allocations_data_logic.get_allocations_of_book", lambda _: ["mock_allocation"])
+    with pytest.raises(Exception, match="Allocation has dependencies and cannot be deleted"):
+        delete_allocation(1)

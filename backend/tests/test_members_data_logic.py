@@ -77,6 +77,46 @@ def test_get_member_with_negative_id(test_db):
 def test_delete_member_with_active_allocations(test_db, monkeypatch):
     member = Member(id=1, name="Active Allocations", email="active@example.com", phone="6666666666")
     add_member(member)
-    monkeypatch.setattr("app.members_data_logic.get_allocations_of_member", lambda _: ["mock_allocation"])
+    monkeypatch.setattr("app.data_logic.members_data_logic.get_allocations_of_member", lambda _: ["mock_allocation"])
     with pytest.raises(Exception, match="Member has active allocations and cannot be deleted"):
         delete_member(1)
+
+# Additional rigorous test cases
+def test_add_member_with_long_name(test_db):
+    long_name = "A" * 256  # Exceeding typical length limits
+    member = Member(id=1, name=long_name, email="long@example.com", phone="1234567890")
+    add_member(member)
+    result = get_member(1)
+    assert result["name"] == long_name
+
+def test_add_duplicate_members(test_db):
+    member1 = Member(id=1, name="John Doe", email="john@example.com", phone="1234567890")
+    add_member(member1)
+    with pytest.raises(Exception):
+        member2 = Member(id=2, name="John Doe", email="john@example.com", phone="0987654321")
+        add_member(member2)
+
+def test_add_member_with_invalid_email_format(test_db):
+    with pytest.raises(Exception):
+        member = Member(id=1, name="Invalid Email", email="invalid-email", phone="1111111111")
+        add_member(member)
+
+def test_edit_member_to_invalid_values(test_db):
+    member = Member(id=1, name="Valid Name", email="valid@example.com", phone="5555555555")
+    add_member(member)
+    with pytest.raises(ValueError):
+        updated_member = Member(id=1, name="", email="", phone="")
+        edit_member(1, updated_member)
+
+def test_fetch_multiple_members_after_deletions(test_db):
+    member1 = Member(id=1, name="Member One", email="one@example.com", phone="123")
+    member2 = Member(id=2, name="Member Two", email="two@example.com", phone="456")
+    add_member(member1)
+    add_member(member2)
+    delete_member(1)
+    members = get_all_members()
+    assert len(members) == 1
+
+def test_delete_nonexistent_member(test_db):
+    with pytest.raises(KeyError):
+        delete_member(99)

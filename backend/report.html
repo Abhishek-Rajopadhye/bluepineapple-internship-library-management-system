@@ -1,0 +1,1091 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title id="head-title">report.html</title>
+      <style type="text/css">body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  /* do not increase min-width as some may use split screens */
+  min-width: 800px;
+  color: #999;
+}
+
+h1 {
+  font-size: 24px;
+  color: black;
+}
+
+h2 {
+  font-size: 16px;
+  color: black;
+}
+
+p {
+  color: black;
+}
+
+a {
+  color: #999;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+/******************************
+ * SUMMARY INFORMATION
+ ******************************/
+#environment td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  vertical-align: top;
+}
+#environment tr:nth-child(odd) {
+  background-color: #f6f6f6;
+}
+#environment ul {
+  margin: 0;
+  padding: 0 20px;
+}
+
+/******************************
+ * TEST RESULT COLORS
+ ******************************/
+span.passed,
+.passed .col-result {
+  color: green;
+}
+
+span.skipped,
+span.xfailed,
+span.rerun,
+.skipped .col-result,
+.xfailed .col-result,
+.rerun .col-result {
+  color: orange;
+}
+
+span.error,
+span.failed,
+span.xpassed,
+.error .col-result,
+.failed .col-result,
+.xpassed .col-result {
+  color: red;
+}
+
+.col-links__extra {
+  margin-right: 3px;
+}
+
+/******************************
+ * RESULTS TABLE
+ *
+ * 1. Table Layout
+ * 2. Extra
+ * 3. Sorting items
+ *
+ ******************************/
+/*------------------
+ * 1. Table Layout
+ *------------------*/
+#results-table {
+  border: 1px solid #e6e6e6;
+  color: #999;
+  font-size: 12px;
+  width: 100%;
+}
+#results-table th,
+#results-table td {
+  padding: 5px;
+  border: 1px solid #e6e6e6;
+  text-align: left;
+}
+#results-table th {
+  font-weight: bold;
+}
+
+/*------------------
+ * 2. Extra
+ *------------------*/
+.logwrapper {
+  max-height: 230px;
+  overflow-y: scroll;
+  background-color: #e6e6e6;
+}
+.logwrapper.expanded {
+  max-height: none;
+}
+.logwrapper.expanded .logexpander:after {
+  content: "collapse [-]";
+}
+.logwrapper .logexpander {
+  z-index: 1;
+  position: sticky;
+  top: 10px;
+  width: max-content;
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 5px 7px;
+  margin: 10px 0 10px calc(100% - 80px);
+  cursor: pointer;
+  background-color: #e6e6e6;
+}
+.logwrapper .logexpander:after {
+  content: "expand [+]";
+}
+.logwrapper .logexpander:hover {
+  color: #000;
+  border-color: #000;
+}
+.logwrapper .log {
+  min-height: 40px;
+  position: relative;
+  top: -50px;
+  height: calc(100% + 50px);
+  border: 1px solid #e6e6e6;
+  color: black;
+  display: block;
+  font-family: "Courier New", Courier, monospace;
+  padding: 5px;
+  padding-right: 80px;
+  white-space: pre-wrap;
+}
+
+div.media {
+  border: 1px solid #e6e6e6;
+  float: right;
+  height: 240px;
+  margin: 0 5px;
+  overflow: hidden;
+  width: 320px;
+}
+
+.media-container {
+  display: grid;
+  grid-template-columns: 25px auto 25px;
+  align-items: center;
+  flex: 1 1;
+  overflow: hidden;
+  height: 200px;
+}
+
+.media-container--fullscreen {
+  grid-template-columns: 0px auto 0px;
+}
+
+.media-container__nav--right,
+.media-container__nav--left {
+  text-align: center;
+  cursor: pointer;
+}
+
+.media-container__viewport {
+  cursor: pointer;
+  text-align: center;
+  height: inherit;
+}
+.media-container__viewport img,
+.media-container__viewport video {
+  object-fit: cover;
+  width: 100%;
+  max-height: 100%;
+}
+
+.media__name,
+.media__counter {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  flex: 0 0 25px;
+  align-items: center;
+}
+
+.collapsible td:not(.col-links) {
+  cursor: pointer;
+}
+.collapsible td:not(.col-links):hover::after {
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.col-result {
+  width: 130px;
+}
+.col-result:hover::after {
+  content: " (hide details)";
+}
+
+.col-result.collapsed:hover::after {
+  content: " (show details)";
+}
+
+#environment-header h2:hover::after {
+  content: " (hide details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+#environment-header.collapsed h2:hover::after {
+  content: " (show details)";
+  color: #bbb;
+  font-style: italic;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/*------------------
+ * 3. Sorting items
+ *------------------*/
+.sortable {
+  cursor: pointer;
+}
+.sortable.desc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: -12.5px;
+  border: 10px solid #4caf50;
+  border-bottom: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+.sortable.asc:after {
+  content: " ";
+  position: relative;
+  left: 5px;
+  bottom: 12.5px;
+  border: 10px solid #4caf50;
+  border-top: 0;
+  border-left-color: transparent;
+  border-right-color: transparent;
+}
+
+.hidden, .summary__reload__button.hidden {
+  display: none;
+}
+
+.summary__data {
+  flex: 0 0 550px;
+}
+.summary__reload {
+  flex: 1 1;
+  display: flex;
+  justify-content: center;
+}
+.summary__reload__button {
+  flex: 0 0 300px;
+  display: flex;
+  color: white;
+  font-weight: bold;
+  background-color: #4caf50;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+}
+.summary__reload__button:hover {
+  background-color: #46a049;
+}
+.summary__spacer {
+  flex: 0 0 550px;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.filters,
+.collapse {
+  display: flex;
+  align-items: center;
+}
+.filters button,
+.collapse button {
+  color: #999;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.filters button:hover,
+.collapse button:hover {
+  color: #ccc;
+}
+
+.filter__label {
+  margin-right: 10px;
+}
+
+      </style>
+    
+  </head>
+  <body>
+    <h1 id="title">report.html</h1>
+    <p>Report generated on 03-Mar-2025 at 16:07:46 by <a href="https://pypi.python.org/pypi/pytest-html">pytest-html</a>
+        v4.1.1</p>
+    <div id="environment-header">
+      <h2>Environment</h2>
+    </div>
+    <table id="environment"></table>
+    <!-- TEMPLATES -->
+      <template id="template_environment_row">
+      <tr>
+        <td></td>
+        <td></td>
+      </tr>
+    </template>
+    <template id="template_results-table__body--empty">
+      <tbody class="results-table-row">
+        <tr id="not-found-message">
+          <td colspan="4">No results found. Check the filters.</th>
+        </tr>
+    </template>
+    <template id="template_results-table__tbody">
+      <tbody class="results-table-row">
+        <tr class="collapsible">
+        </tr>
+        <tr class="extras-row">
+          <td class="extra" colspan="4">
+            <div class="extraHTML"></div>
+            <div class="media">
+              <div class="media-container">
+                  <div class="media-container__nav--left"><</div>
+                  <div class="media-container__viewport">
+                    <img src="" />
+                    <video controls>
+                      <source src="" type="video/mp4">
+                    </video>
+                  </div>
+                  <div class="media-container__nav--right">></div>
+                </div>
+                <div class="media__name"></div>
+                <div class="media__counter"></div>
+            </div>
+            <div class="logwrapper">
+              <div class="logexpander"></div>
+              <div class="log"></div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </template>
+    <!-- END TEMPLATES -->
+    <div class="summary">
+      <div class="summary__data">
+        <h2>Summary</h2>
+        <div class="additional-summary prefix">
+        </div>
+        <p class="run-count">55 tests took 00:00:22.</p>
+        <p class="filter">(Un)check the boxes to filter the results.</p>
+        <div class="summary__reload">
+          <div class="summary__reload__button hidden" onclick="location.reload()">
+            <div>There are still tests running. <br />Reload this page to get the latest results!</div>
+          </div>
+        </div>
+        <div class="summary__spacer"></div>
+        <div class="controls">
+          <div class="filters">
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="failed" />
+            <span class="failed">51 Failed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="passed" />
+            <span class="passed">4 Passed,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="skipped" disabled/>
+            <span class="skipped">0 Skipped,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xfailed" disabled/>
+            <span class="xfailed">0 Expected failures,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="xpassed" disabled/>
+            <span class="xpassed">0 Unexpected passes,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="error" disabled/>
+            <span class="error">0 Errors,</span>
+            <input checked="true" class="filter" name="filter_checkbox" type="checkbox" data-test-result="rerun" disabled/>
+            <span class="rerun">0 Reruns</span>
+          </div>
+          <div class="collapse">
+            <button id="show_all_details">Show all details</button>&nbsp;/&nbsp;<button id="hide_all_details">Hide all details</button>
+          </div>
+        </div>
+      </div>
+      <div class="additional-summary summary">
+      </div>
+      <div class="additional-summary postfix">
+      </div>
+    </div>
+    <table id="results-table">
+      <thead id="results-table-head">
+        <tr>
+          <th class="sortable" data-column-type="result">Result</th>
+          <th class="sortable" data-column-type="testId">Test</th>
+          <th class="sortable" data-column-type="duration">Duration</th>
+          <th>Links</th>
+        </tr>
+      </thead>
+    </table>
+  </body>
+  <footer>
+    <div id="data-container" data-jsonblob="{&#34;environment&#34;: {&#34;Python&#34;: &#34;3.13.2&#34;, &#34;Platform&#34;: &#34;Windows-11-10.0.22635-SP0&#34;, &#34;Packages&#34;: {&#34;pytest&#34;: &#34;8.3.5&#34;, &#34;pluggy&#34;: &#34;1.5.0&#34;}, &#34;Plugins&#34;: {&#34;anyio&#34;: &#34;4.8.0&#34;, &#34;html&#34;: &#34;4.1.1&#34;, &#34;metadata&#34;: &#34;3.1.1&#34;}}, &#34;tests&#34;: {&#34;tests/test_allocations_data_logic.py::test_add_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_add_allocation&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_add_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_allocations_data_logic.py::test_get_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_get_allocation&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_get_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x00000178362D6C50&amp;gt;\n\n    def test_get_allocation(test_db):\n        allocation = Allocation(id=1, book_id=2, member_id=3, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)\n        add_allocation(allocation)\n        retrieved = get_allocation(1)\n&amp;gt;       assert retrieved[&amp;quot;member_id&amp;quot;] == 3\nE       assert 1 == 3\n\ntests\\test_allocations_data_logic.py:49: AssertionError\n&#34;}], &#34;tests/test_allocations_data_logic.py::test_get_all_allocations&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_get_all_allocations&#34;, &#34;duration&#34;: &#34;14 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_get_all_allocations&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;14 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x00000178362D74C0&amp;gt;\n\n    def test_get_all_allocations(test_db):\n        allocation1 = Allocation(id=1, book_id=1, member_id=1, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)\n        allocation2 = Allocation(id=2, book_id=2, member_id=2, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)\n        add_allocation(allocation1)\n        add_allocation(allocation2)\n        allocations = get_all_allocation()\n&amp;gt;       assert len(allocations) == 2\nE       AssertionError: assert 10 == 2\nE        +  where 10 = len([{&amp;#x27;book_id&amp;#x27;: 1, &amp;#x27;end_date&amp;#x27;: &amp;#x27;2025-03-03&amp;#x27;, &amp;#x27;id&amp;#x27;: 1, &amp;#x27;member_id&amp;#x27;: 1, ...}, {&amp;#x27;book_id&amp;#x27;: 2, &amp;#x27;end_date&amp;#x27;: &amp;#x27;2025-03-03&amp;#x27;, &amp;#x27;id&amp;#x27;...025-03-03&amp;#x27;, &amp;#x27;id&amp;#x27;: 5, &amp;#x27;member_id&amp;#x27;: 1, ...}, {&amp;#x27;book_id&amp;#x27;: 1, &amp;#x27;end_date&amp;#x27;: &amp;#x27;2025-03-03&amp;#x27;, &amp;#x27;id&amp;#x27;: 6, &amp;#x27;member_id&amp;#x27;: 1, ...}, ...])\n\ntests\\test_allocations_data_logic.py:57: AssertionError\n&#34;}], &#34;tests/test_allocations_data_logic.py::test_edit_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_edit_allocation&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_edit_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;allocation_id = 1, allocation = &amp;lt;sqlite3.Row object at 0x00000178363A8940&amp;gt;\n\n    def edit_allocation(allocation_id:int, allocation: Allocation):\n        &amp;quot;&amp;quot;&amp;quot;\n        Edit an existing allocation&amp;#x27;s details in the database.\n        Connects to the database, executes an update query to modify the allocation&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            allocation (Allocation): An instance of the Allocation class containing the updated allocation&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(allocation_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Allocation ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n    \n            if(not allocation):\n                raise KeyError(&amp;quot;Allocation not found&amp;quot;)\n    \n            cursor.execute(&amp;quot;UPDATE Allocations SET book_id=?, member_id=?, start_date=?, end_date=?, returned=?, overdue=? WHERE id=?;&amp;quot;,\n&amp;gt;                          (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue, allocation_id))\nE                          AttributeError: &amp;#x27;sqlite3.Row&amp;#x27; object has no attribute &amp;#x27;book_id&amp;#x27;\n\napp\\data_logic\\allocations_data_logic.py:165: AttributeError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x00000178362D7C40&amp;gt;\n\n    def test_edit_allocation(test_db):\n        allocation = Allocation(id=1, book_id=1, member_id=1, start_date=date.today(), end_date=date.today(), returned=False, overdue=False)\n        add_allocation(allocation)\n        updated_allocation = Allocation(id=1, book_id=2, member_id=2, start_date=date.today(), end_date=date.today(), returned=True, overdue=False)\n&amp;gt;       edit_allocation(1, updated_allocation)\n\ntests\\test_allocations_data_logic.py:63: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nallocation_id = 1, allocation = &amp;lt;sqlite3.Row object at 0x00000178363A8940&amp;gt;\n\n    def edit_allocation(allocation_id:int, allocation: Allocation):\n        &amp;quot;&amp;quot;&amp;quot;\n        Edit an existing allocation&amp;#x27;s details in the database.\n        Connects to the database, executes an update query to modify the allocation&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            allocation (Allocation): An instance of the Allocation class containing the updated allocation&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(allocation_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Allocation ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n    \n            if(not allocation):\n                raise KeyError(&amp;quot;Allocation not found&amp;quot;)\n    \n            cursor.execute(&amp;quot;UPDATE Allocations SET book_id=?, member_id=?, start_date=?, end_date=?, returned=?, overdue=? WHERE id=?;&amp;quot;,\n                           (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue, allocation_id))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;sqlite3.Row&amp;#x27; object has no attribute &amp;#x27;book_id&amp;#x27;\n\napp\\data_logic\\allocations_data_logic.py:171: Exception\n&#34;}], &#34;tests/test_allocations_data_logic.py::test_get_nonexistent_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_get_nonexistent_allocation&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_get_nonexistent_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;allocation_id = 99\n\n    def get_allocation(allocation_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific allocation from the database by its ID.\n        Connects to the database, executes a query to fetch the allocation with the given ID, and returns the result as a dictionary.\n        Parameters:\n            allocation_id (int): The ID of the allocation to retrieve.\n        Returns:\n            allocation (dict): A dictionary representing the allocation.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n            conn.close()\n&amp;gt;           return dict(allocation)\nE           TypeError: &amp;#x27;NoneType&amp;#x27; object is not iterable\n\napp\\data_logic\\allocations_data_logic.py:43: TypeError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x00000178362D72E0&amp;gt;\n\n    def test_get_nonexistent_allocation(test_db):\n        with pytest.raises(KeyError):\n&amp;gt;           get_allocation(99)\n\ntests\\test_allocations_data_logic.py:69: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nallocation_id = 99\n\n    def get_allocation(allocation_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific allocation from the database by its ID.\n        Connects to the database, executes a query to fetch the allocation with the given ID, and returns the result as a dictionary.\n        Parameters:\n            allocation_id (int): The ID of the allocation to retrieve.\n        Returns:\n            allocation (dict): A dictionary representing the allocation.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n            conn.close()\n            return dict(allocation)\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;NoneType&amp;#x27; object is not iterable\n\napp\\data_logic\\allocations_data_logic.py:47: Exception\n&#34;}], &#34;tests/test_allocations_data_logic.py::test_add_overdue_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_add_overdue_allocation&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_add_overdue_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x00000178364046D0&amp;gt;\n\n    def test_add_overdue_allocation(test_db):\n        allocation = Allocation(id=1, book_id=1, member_id=1, start_date=date.today(), end_date=date.today(), returned=False, overdue=True)\n        add_allocation(allocation)\n        result = get_allocation(1)\n&amp;gt;       assert result[&amp;quot;overdue&amp;quot;] is True\nE       assert 0 is True\n\ntests\\test_allocations_data_logic.py:75: AssertionError\n&#34;}], &#34;tests/test_allocations_data_logic.py::test_get_allocation_with_negative_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_get_allocation_with_negative_id&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_get_allocation_with_negative_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;allocation_id = -1\n\n    def get_allocation(allocation_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific allocation from the database by its ID.\n        Connects to the database, executes a query to fetch the allocation with the given ID, and returns the result as a dictionary.\n        Parameters:\n            allocation_id (int): The ID of the allocation to retrieve.\n        Returns:\n            allocation (dict): A dictionary representing the allocation.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n            conn.close()\n&amp;gt;           return dict(allocation)\nE           TypeError: &amp;#x27;NoneType&amp;#x27; object is not iterable\n\napp\\data_logic\\allocations_data_logic.py:43: TypeError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x00000178364048B0&amp;gt;\n\n    def test_get_allocation_with_negative_id(test_db):\n        with pytest.raises(ValueError):\n&amp;gt;           get_allocation(-1)\n\ntests\\test_allocations_data_logic.py:79: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nallocation_id = -1\n\n    def get_allocation(allocation_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific allocation from the database by its ID.\n        Connects to the database, executes a query to fetch the allocation with the given ID, and returns the result as a dictionary.\n        Parameters:\n            allocation_id (int): The ID of the allocation to retrieve.\n        Returns:\n            allocation (dict): A dictionary representing the allocation.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n            conn.close()\n            return dict(allocation)\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;NoneType&amp;#x27; object is not iterable\n\napp\\data_logic\\allocations_data_logic.py:47: Exception\n&#34;}], &#34;tests/test_allocations_data_logic.py::test_delete_nonexistent_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_data_logic.py::test_delete_nonexistent_allocation&#34;, &#34;duration&#34;: &#34;3 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_data_logic.py::test_delete_nonexistent_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;3 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;allocation_id = 99\n\n    def delete_allocation(allocation_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Delete an allocation from the database by its ID.\n        Connects to the database, executes a delete query to remove the allocation with the given ID, and commits the transaction.\n        Parameters:\n            allocation_id (int): The ID of the allocation to delete.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(allocation_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Allocation ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n    \n            if(not allocation):\n&amp;gt;               raise KeyError(&amp;quot;Allocation not found&amp;quot;)\nE               KeyError: &amp;#x27;Allocation not found&amp;#x27;\n\napp\\data_logic\\allocations_data_logic.py:194: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x0000017836405030&amp;gt;\n\n    def test_delete_nonexistent_allocation(test_db):\n        with pytest.raises(KeyError):\n&amp;gt;           delete_allocation(99)\n\ntests\\test_allocations_data_logic.py:83: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nallocation_id = 99\n\n    def delete_allocation(allocation_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Delete an allocation from the database by its ID.\n        Connects to the database, executes a delete query to remove the allocation with the given ID, and commits the transaction.\n        Parameters:\n            allocation_id (int): The ID of the allocation to delete.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n            exception: If any other error occurs\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(allocation_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Allocation ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            allocation = conn.execute(&amp;quot;SELECT * FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,)).fetchone()\n    \n            if(not allocation):\n                raise KeyError(&amp;quot;Allocation not found&amp;quot;)\n    \n            cursor.execute(&amp;quot;DELETE FROM Allocations WHERE id=?;&amp;quot;, (allocation_id,))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;Allocation not found&amp;#x27;\n\napp\\data_logic\\allocations_data_logic.py:202: Exception\n&#34;}], &#34;tests/test_allocations_routes.py::test_get_all_allocations&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_get_all_allocations&#34;, &#34;duration&#34;: &#34;23 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_get_all_allocations&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;23 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_allocations_routes.py::test_get_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_get_allocation&#34;, &#34;duration&#34;: &#34;7 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_get_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;7 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_allocation():\n        response = client.post(&amp;quot;/allocations/&amp;quot;, json={&amp;quot;book_id&amp;quot;: 1, &amp;quot;member_id&amp;quot;: 1, &amp;quot;start_date&amp;quot;: str(date.today()), &amp;quot;end_date&amp;quot;: str(date.today()), &amp;quot;returned&amp;quot;: False, &amp;quot;overdue&amp;quot;: False})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:17: AssertionError\n&#34;}], &#34;tests/test_allocations_routes.py::test_add_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_add_allocation&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_add_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_add_allocation():\n        response = client.post(&amp;quot;/allocations/&amp;quot;, json={&amp;quot;book_id&amp;quot;: 2, &amp;quot;member_id&amp;quot;: 2, &amp;quot;start_date&amp;quot;: str(date.today()), &amp;quot;end_date&amp;quot;: str(date.today()), &amp;quot;returned&amp;quot;: False, &amp;quot;overdue&amp;quot;: False})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:25: AssertionError\n&#34;}], &#34;tests/test_allocations_routes.py::test_edit_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_edit_allocation&#34;, &#34;duration&#34;: &#34;5 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_edit_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;5 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_edit_allocation():\n        response = client.put(&amp;quot;/allocations/1&amp;quot;, json={&amp;quot;book_id&amp;quot;: 1, &amp;quot;member_id&amp;quot;: 1, &amp;quot;start_date&amp;quot;: str(date.today()), &amp;quot;end_date&amp;quot;: str(date.today()), &amp;quot;returned&amp;quot;: True, &amp;quot;overdue&amp;quot;: False})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:30: AssertionError\n&#34;}], &#34;tests/test_allocations_routes.py::test_get_nonexistent_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_get_nonexistent_allocation&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_get_nonexistent_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_nonexistent_allocation():\n        response = client.get(&amp;quot;/allocations/99&amp;quot;)\n&amp;gt;       assert response.status_code == 404\nE       assert 500 == 404\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:35: AssertionError\n&#34;}], &#34;tests/test_allocations_routes.py::test_add_overdue_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_add_overdue_allocation&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_add_overdue_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_add_overdue_allocation():\n        response = client.post(&amp;quot;/allocations/&amp;quot;, json={&amp;quot;book_id&amp;quot;: 3, &amp;quot;member_id&amp;quot;: 3, &amp;quot;start_date&amp;quot;: str(date.today()), &amp;quot;end_date&amp;quot;: str(date.today()), &amp;quot;returned&amp;quot;: False, &amp;quot;overdue&amp;quot;: True})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:39: AssertionError\n&#34;}], &#34;tests/test_allocations_routes.py::test_get_allocation_with_invalid_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_get_allocation_with_invalid_id&#34;, &#34;duration&#34;: &#34;7 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_get_allocation_with_invalid_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;7 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_allocation_with_invalid_id():\n        response = client.get(&amp;quot;/allocations/-1&amp;quot;)\n&amp;gt;       assert response.status_code == 400\nE       assert 500 == 400\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:43: AssertionError\n&#34;}], &#34;tests/test_allocations_routes.py::test_delete_nonexistent_allocation&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_allocations_routes.py::test_delete_nonexistent_allocation&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_allocations_routes.py::test_delete_nonexistent_allocation&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_delete_nonexistent_allocation():\n        response = client.delete(&amp;quot;/allocations/99&amp;quot;)\n&amp;gt;       assert response.status_code == 404\nE       assert 500 == 404\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_allocations_routes.py:47: AssertionError\n&#34;}], &#34;tests/test_books_data_logic.py::test_add_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_add_book&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_add_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = 1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n&amp;gt;               raise KeyError(&amp;quot;Book not found&amp;quot;)\nE               KeyError: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:50: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x0000017836407F10&amp;gt;\n\n    def test_add_book(test_db):\n        book = Book(id=1, name=&amp;quot;Test Book&amp;quot;, author=&amp;quot;Author&amp;quot;, total_copies=5, allocated_copies=0)\n        add_book(book)\n&amp;gt;       result = get_book(1)\n\ntests\\test_books_data_logic.py:39: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = 1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            return dict(book)\n    \n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:57: Exception\n&#34;}], &#34;tests/test_books_data_logic.py::test_get_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_get_book&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_get_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = 1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n&amp;gt;               raise KeyError(&amp;quot;Book not found&amp;quot;)\nE               KeyError: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:50: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648CC70&amp;gt;\n\n    def test_get_book(test_db):\n        book = Book(id=1, name=&amp;quot;Sample Book&amp;quot;, author=&amp;quot;Writer&amp;quot;, total_copies=3, allocated_copies=0)\n        add_book(book)\n&amp;gt;       retrieved = get_book(1)\n\ntests\\test_books_data_logic.py:45: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = 1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            return dict(book)\n    \n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:57: Exception\n&#34;}], &#34;tests/test_books_data_logic.py::test_get_all_books&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_get_all_books&#34;, &#34;duration&#34;: &#34;13 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_get_all_books&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;13 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x000001783648D030&amp;gt;\n\n    def test_get_all_books(test_db):\n        book1 = Book(id=1, name=&amp;quot;Book One&amp;quot;, author=&amp;quot;Author1&amp;quot;, total_copies=2, allocated_copies=0)\n        book2 = Book(id=2, name=&amp;quot;Book Two&amp;quot;, author=&amp;quot;Author2&amp;quot;, total_copies=4, allocated_copies=0)\n        add_book(book1)\n        add_book(book2)\n        books = get_all_books()\n&amp;gt;       assert len(books) == 2\nE       AssertionError: assert 10 == 2\nE        +  where 10 = len([{&amp;#x27;allocated_copies&amp;#x27;: 2, &amp;#x27;author&amp;#x27;: &amp;#x27;Writer&amp;#x27;, &amp;#x27;id&amp;#x27;: 2, &amp;#x27;name&amp;#x27;: &amp;#x27;Sample Book&amp;#x27;, ...}, {&amp;#x27;allocated_copies&amp;#x27;: 0, &amp;#x27;author&amp;#x27;: &amp;#x27;... &amp;#x27;name&amp;#x27;: &amp;#x27;Empty Book&amp;#x27;, ...}, {&amp;#x27;allocated_copies&amp;#x27;: 0, &amp;#x27;author&amp;#x27;: &amp;#x27;Someone&amp;#x27;, &amp;#x27;id&amp;#x27;: 7, &amp;#x27;name&amp;#x27;: &amp;#x27;Allocated Book&amp;#x27;, ...}, ...])\n\ntests\\test_books_data_logic.py:54: AssertionError\n&#34;}], &#34;tests/test_books_data_logic.py::test_edit_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_edit_book&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_edit_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = 1, book = Book(name=&amp;#x27;New Title&amp;#x27;, author=&amp;#x27;New Author&amp;#x27;, total_copies=5, allocated_copies=0, id=1)\n\n    def edit_book(book_id:int, book: Book):\n        &amp;quot;&amp;quot;&amp;quot;\n        Edit an existing book&amp;#x27;s details in the database.\n        Connects to the database, executes an update query to modify the book&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            book_id (int): The ID of the book to update/edit.\n            book (Book): An instance of the Book class containing the updated book&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            existingBook = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n    \n            if(not existingBook):\n&amp;gt;               raise KeyError(&amp;quot;Book not found&amp;quot;)\nE               KeyError: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:141: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648C8B0&amp;gt;\n\n    def test_edit_book(test_db):\n        book = Book(id=1, name=&amp;quot;Old Title&amp;quot;, author=&amp;quot;Old Author&amp;quot;, total_copies=3, allocated_copies=0)\n        add_book(book)\n        updated_book = Book(id=1, name=&amp;quot;New Title&amp;quot;, author=&amp;quot;New Author&amp;quot;, total_copies=5, allocated_copies=0)\n&amp;gt;       edit_book(1, updated_book)\n\ntests\\test_books_data_logic.py:60: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = 1, book = Book(name=&amp;#x27;New Title&amp;#x27;, author=&amp;#x27;New Author&amp;#x27;, total_copies=5, allocated_copies=0, id=1)\n\n    def edit_book(book_id:int, book: Book):\n        &amp;quot;&amp;quot;&amp;quot;\n        Edit an existing book&amp;#x27;s details in the database.\n        Connects to the database, executes an update query to modify the book&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            book_id (int): The ID of the book to update/edit.\n            book (Book): An instance of the Book class containing the updated book&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            existingBook = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n    \n            if(not existingBook):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            cursor.execute(&amp;quot;UPDATE Books SET name=?, author=?, total_copies=?, allocated_copies=? WHERE id=?;&amp;quot;, (book.name, book.author, book.total_copies, book.allocated_copies, book_id))\n    \n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise RuntimeError(f&amp;quot;Error: {exception}&amp;quot;)\nE           RuntimeError: Error: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:150: RuntimeError\n&#34;}], &#34;tests/test_books_data_logic.py::test_get_nonexistent_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_get_nonexistent_book&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_get_nonexistent_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = 99\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n&amp;gt;               raise KeyError(&amp;quot;Book not found&amp;quot;)\nE               KeyError: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:50: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648DB70&amp;gt;\n\n    def test_get_nonexistent_book(test_db):\n        with pytest.raises(KeyError):\n&amp;gt;           get_book(99)\n\ntests\\test_books_data_logic.py:66: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = 99\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            return dict(book)\n    \n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:57: Exception\n&#34;}], &#34;tests/test_books_data_logic.py::test_add_book_with_zero_copies&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_add_book_with_zero_copies&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_add_book_with_zero_copies&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = 1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n&amp;gt;               raise KeyError(&amp;quot;Book not found&amp;quot;)\nE               KeyError: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:50: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648DF30&amp;gt;\n\n    def test_add_book_with_zero_copies(test_db):\n        book = Book(id=1, name=&amp;quot;Empty Book&amp;quot;, author=&amp;quot;Nobody&amp;quot;, total_copies=0, allocated_copies=0)\n        add_book(book)\n&amp;gt;       result = get_book(1)\n\ntests\\test_books_data_logic.py:71: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = 1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            return dict(book)\n    \n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:57: Exception\n&#34;}], &#34;tests/test_books_data_logic.py::test_get_book_with_negative_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_get_book_with_negative_id&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_get_book_with_negative_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = -1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n&amp;gt;               raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\nE               ValueError: Book ID must be a positive integer\n\napp\\data_logic\\books_data_logic.py:43: ValueError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648DE40&amp;gt;\n\n    def test_get_book_with_negative_id(test_db):\n        with pytest.raises(ValueError):\n&amp;gt;           get_book(-1)\n\ntests\\test_books_data_logic.py:76: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = -1\n\n    def get_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific book from the database by its ID.\n        Connects to the database, executes a query to fetch the book with the given ID, and returns the result as a dictionary.\n        Parameters:\n            book_id (int): The ID of the book to retrieve.\n        Returns:\n            book (dict): A dictionary representing the book.\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            book = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n            conn.close()\n    \n            if(not book):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            return dict(book)\n    \n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: Book ID must be a positive integer\n\napp\\data_logic\\books_data_logic.py:57: Exception\n&#34;}], &#34;tests/test_books_data_logic.py::test_delete_allocated_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_data_logic.py::test_delete_allocated_book&#34;, &#34;duration&#34;: &#34;8 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_data_logic.py::test_delete_allocated_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;8 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;book_id = 1\n\n    def delete_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Delete a book from the database by its ID.\n        Connects to the database, executes a delete query to remove the book with the given ID, and commits the transaction.\n        Parameters:\n            book_id (int): The ID of the book to delete.\n        Returns:\n            None\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            existingBook = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n    \n            if(not existingBook):\n&amp;gt;               raise KeyError(&amp;quot;Book not found&amp;quot;)\nE               KeyError: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:175: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648F1F0&amp;gt;\n\n    def test_delete_allocated_book(test_db):\n        book = Book(id=1, name=&amp;quot;Allocated Book&amp;quot;, author=&amp;quot;Someone&amp;quot;, total_copies=2, allocated_copies=1)\n        add_book(book)\n        with pytest.raises(Exception, match=&amp;quot;Cannot delete a book that has been allocated&amp;quot;):\n&amp;gt;           delete_book(1)\n\ntests\\test_books_data_logic.py:82: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nbook_id = 1\n\n    def delete_book(book_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Delete a book from the database by its ID.\n        Connects to the database, executes a delete query to remove the book with the given ID, and commits the transaction.\n        Parameters:\n            book_id (int): The ID of the book to delete.\n        Returns:\n            None\n        Raises:\n            ValueError: If the book ID is not a positive integer.\n            KeyError: If the book is not found.\n            sqlite3.Error: If there is an issue with the database connection or query execution.\n            Exception: If any other error occurs.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(book_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Book ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            cursor = conn.cursor()\n            existingBook = conn.execute(&amp;quot;SELECT * FROM Books WHERE id=?;&amp;quot;, (book_id,)).fetchone()\n    \n            if(not existingBook):\n                raise KeyError(&amp;quot;Book not found&amp;quot;)\n    \n            if(existingBook[&amp;#x27;allocated_copies&amp;#x27;] &amp;gt; 0):\n                raise Exception(&amp;quot;Cannot delete a book that has been allocated&amp;quot;)\n    \n            cursor.execute(&amp;quot;DELETE FROM Books WHERE id=?;&amp;quot;, (book_id,))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as exception:\n&amp;gt;           raise Exception(f&amp;quot;Error: {exception}&amp;quot;)\nE           Exception: Error: &amp;#x27;Book not found&amp;#x27;\n\napp\\data_logic\\books_data_logic.py:186: Exception\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648F1F0&amp;gt;\n\n    def test_delete_allocated_book(test_db):\n        book = Book(id=1, name=&amp;quot;Allocated Book&amp;quot;, author=&amp;quot;Someone&amp;quot;, total_copies=2, allocated_copies=1)\n        add_book(book)\n&amp;gt;       with pytest.raises(Exception, match=&amp;quot;Cannot delete a book that has been allocated&amp;quot;):\nE       AssertionError: Regex pattern did not match.\nE        Regex: &amp;#x27;Cannot delete a book that has been allocated&amp;#x27;\nE        Input: &amp;quot;Error: &amp;#x27;Book not found&amp;#x27;&amp;quot;\n\ntests\\test_books_data_logic.py:81: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_get_all_books&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_get_all_books&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_get_all_books&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_books_routes.py::test_get_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_get_book&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_get_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_book():\n        response = client.post(&amp;quot;/books/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Test Book&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;Author&amp;quot;, &amp;quot;total_copies&amp;quot;: 5})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_books_routes.py:16: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_add_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_add_book&#34;, &#34;duration&#34;: &#34;5 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_add_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;5 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_add_book():\n        response = client.post(&amp;quot;/books/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;New Book&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;New Author&amp;quot;, &amp;quot;total_copies&amp;quot;: 3})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_books_routes.py:24: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_edit_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_edit_book&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_edit_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_edit_book():\n        response = client.put(&amp;quot;/books/1&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Updated Book&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;Updated Author&amp;quot;, &amp;quot;total_copies&amp;quot;: 10, &amp;quot;allocated_copies&amp;quot;: 0})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_books_routes.py:29: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_get_nonexistent_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_get_nonexistent_book&#34;, &#34;duration&#34;: &#34;7 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_get_nonexistent_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;7 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_nonexistent_book():\n        response = client.get(&amp;quot;/books/99&amp;quot;)\n&amp;gt;       assert response.status_code == 404\nE       assert 500 == 404\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_books_routes.py:34: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_add_book_with_zero_copies&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_add_book_with_zero_copies&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_add_book_with_zero_copies&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_add_book_with_zero_copies():\n        response = client.post(&amp;quot;/books/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Zero Copies&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;Nobody&amp;quot;, &amp;quot;total_copies&amp;quot;: 0})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_books_routes.py:38: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_get_book_with_invalid_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_get_book_with_invalid_id&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_get_book_with_invalid_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_book_with_invalid_id():\n        response = client.get(&amp;quot;/books/-1&amp;quot;)\n&amp;gt;       assert response.status_code == 400\nE       assert 500 == 400\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_books_routes.py:42: AssertionError\n&#34;}], &#34;tests/test_books_routes.py::test_delete_allocated_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_books_routes.py::test_delete_allocated_book&#34;, &#34;duration&#34;: &#34;9 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_books_routes.py::test_delete_allocated_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;9 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_delete_allocated_book():\n        client.post(&amp;quot;/books/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Allocated Book&amp;quot;, &amp;quot;author&amp;quot;: &amp;quot;Someone&amp;quot;, &amp;quot;total_copies&amp;quot;: 2})\n        response = client.delete(&amp;quot;/books/1&amp;quot;)\n&amp;gt;       assert response.status_code == 400\nE       assert 500 == 400\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_books_routes.py:47: AssertionError\n&#34;}], &#34;tests/test_database.py::test_insert_and_retrieve_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_insert_and_retrieve_book&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_insert_and_retrieve_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x00000178364AC310&amp;gt;\n\n    def test_insert_and_retrieve_book(test_db):\n        cursor = test_db.cursor()\n&amp;gt;       cursor.execute(&amp;quot;INSERT INTO Books (name, author, total_copies) VALUES (?, ?, ?)&amp;quot;, (&amp;quot;Test Book&amp;quot;, &amp;quot;Author&amp;quot;, 5))\nE       sqlite3.OperationalError: no such table: Books\n\ntests\\test_database.py:18: OperationalError\n&#34;}], &#34;tests/test_database.py::test_update_book&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_update_book&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_update_book&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x0000017836405030&amp;gt;\n\n    def test_update_book(test_db):\n        cursor = test_db.cursor()\n&amp;gt;       cursor.execute(&amp;quot;INSERT INTO Books (name, author, total_copies) VALUES (?, ?, ?)&amp;quot;, (&amp;quot;Old Book&amp;quot;, &amp;quot;Old Author&amp;quot;, 3))\nE       sqlite3.OperationalError: no such table: Books\n\ntests\\test_database.py:25: OperationalError\n&#34;}], &#34;tests/test_database.py::test_fetch_multiple_members&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_fetch_multiple_members&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_fetch_multiple_members&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x00000178364044F0&amp;gt;\n\n    def test_fetch_multiple_members(test_db):\n        cursor = test_db.cursor()\n&amp;gt;       cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?)&amp;quot;, (&amp;quot;Member1&amp;quot;, &amp;quot;m1@example.com&amp;quot;, &amp;quot;123&amp;quot;))\nE       sqlite3.OperationalError: no such table: Members\n\ntests\\test_database.py:34: OperationalError\n&#34;}], &#34;tests/test_database.py::test_foreign_key_constraint&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_foreign_key_constraint&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_foreign_key_constraint&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x0000017836404F40&amp;gt;\n\n    def test_foreign_key_constraint(test_db):\n        cursor = test_db.cursor()\n        with pytest.raises(sqlite3.IntegrityError):\n&amp;gt;           cursor.execute(&amp;quot;INSERT INTO Allocations (book_id, member_id, start_date, end_date) VALUES (?, ?, ?, ?)&amp;quot;, (99, 99, &amp;quot;2023-01-01&amp;quot;, &amp;quot;2023-02-01&amp;quot;))\nE           sqlite3.OperationalError: no such table: Allocations\n\ntests\\test_database.py:43: OperationalError\n&#34;}], &#34;tests/test_database.py::test_insert_duplicate_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_insert_duplicate_member&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_insert_duplicate_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x0000017836404400&amp;gt;\n\n    def test_insert_duplicate_member(test_db):\n        cursor = test_db.cursor()\n&amp;gt;       cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?)&amp;quot;, (&amp;quot;John Doe&amp;quot;, &amp;quot;john@example.com&amp;quot;, &amp;quot;1234567890&amp;quot;))\nE       sqlite3.OperationalError: no such table: Members\n\ntests\\test_database.py:47: OperationalError\n&#34;}], &#34;tests/test_database.py::test_null_optional_fields&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_null_optional_fields&#34;, &#34;duration&#34;: &#34;3 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_null_optional_fields&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;3 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x000001783648E3E0&amp;gt;\n\n    def test_null_optional_fields(test_db):\n        cursor = test_db.cursor()\n&amp;gt;       cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?)&amp;quot;, (&amp;quot;No Email&amp;quot;, None, &amp;quot;1111111111&amp;quot;))\nE       sqlite3.OperationalError: no such table: Members\n\ntests\\test_database.py:54: OperationalError\n&#34;}], &#34;tests/test_database.py::test_delete_member_with_allocations&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_database.py::test_delete_member_with_allocations&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_database.py::test_delete_member_with_allocations&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x000001783648C220&amp;gt;\n\n    def test_delete_member_with_allocations(test_db):\n        cursor = test_db.cursor()\n&amp;gt;       cursor.execute(&amp;quot;INSERT INTO Books (name, author, total_copies) VALUES (?, ?, ?)&amp;quot;, (&amp;quot;Test Book&amp;quot;, &amp;quot;Author&amp;quot;, 5))\nE       sqlite3.OperationalError: no such table: Books\n\ntests\\test_database.py:61: OperationalError\n&#34;}], &#34;tests/test_member_routes.py::test_get_all_members&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Passed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_get_all_members&#34;, &#34;duration&#34;: &#34;5 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Passed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_get_all_members&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;5 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;No log output captured.&#34;}], &#34;tests/test_member_routes.py::test_get_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_get_member&#34;, &#34;duration&#34;: &#34;5 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_get_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;5 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_member():\n        response = client.post(&amp;quot;/members/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;John Doe&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;john@example.com&amp;quot;, &amp;quot;phone&amp;quot;: &amp;quot;1234567890&amp;quot;})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_member_routes.py:16: AssertionError\n&#34;}], &#34;tests/test_member_routes.py::test_add_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_add_member&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_add_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_add_member():\n        response = client.post(&amp;quot;/members/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Jane Doe&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;jane@example.com&amp;quot;, &amp;quot;phone&amp;quot;: &amp;quot;0987654321&amp;quot;})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_member_routes.py:24: AssertionError\n&#34;}], &#34;tests/test_member_routes.py::test_edit_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_edit_member&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_edit_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_edit_member():\n        response = client.put(&amp;quot;/members/1&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Updated Name&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;updated@example.com&amp;quot;, &amp;quot;phone&amp;quot;: &amp;quot;5555555555&amp;quot;})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_member_routes.py:29: AssertionError\n&#34;}], &#34;tests/test_member_routes.py::test_get_nonexistent_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_get_nonexistent_member&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_get_nonexistent_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_nonexistent_member():\n        response = client.get(&amp;quot;/members/99&amp;quot;)\n&amp;gt;       assert response.status_code == 404\nE       assert 500 == 404\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_member_routes.py:34: AssertionError\n&#34;}], &#34;tests/test_member_routes.py::test_add_member_without_email&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_add_member_without_email&#34;, &#34;duration&#34;: &#34;4 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_add_member_without_email&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;4 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_add_member_without_email():\n        response = client.post(&amp;quot;/members/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;No Email&amp;quot;, &amp;quot;email&amp;quot;: None, &amp;quot;phone&amp;quot;: &amp;quot;7777777777&amp;quot;})\n&amp;gt;       assert response.status_code == 200\nE       assert 422 == 200\nE        +  where 422 = &amp;lt;Response [422 Unprocessable Entity]&amp;gt;.status_code\n\ntests\\test_member_routes.py:38: AssertionError\n&#34;}], &#34;tests/test_member_routes.py::test_get_member_with_invalid_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_get_member_with_invalid_id&#34;, &#34;duration&#34;: &#34;6 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_get_member_with_invalid_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;6 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_get_member_with_invalid_id():\n        response = client.get(&amp;quot;/members/-1&amp;quot;)\n&amp;gt;       assert response.status_code == 400\nE       assert 500 == 400\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_member_routes.py:42: AssertionError\n&#34;}], &#34;tests/test_member_routes.py::test_delete_member_with_active_allocations&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_member_routes.py::test_delete_member_with_active_allocations&#34;, &#34;duration&#34;: &#34;9 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_member_routes.py::test_delete_member_with_active_allocations&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;9 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;def test_delete_member_with_active_allocations():\n        client.post(&amp;quot;/members/&amp;quot;, json={&amp;quot;name&amp;quot;: &amp;quot;Active Allocations&amp;quot;, &amp;quot;email&amp;quot;: &amp;quot;active@example.com&amp;quot;, &amp;quot;phone&amp;quot;: &amp;quot;6666666666&amp;quot;})\n        response = client.delete(&amp;quot;/members/1&amp;quot;)\n&amp;gt;       assert response.status_code == 400\nE       assert 500 == 400\nE        +  where 500 = &amp;lt;Response [500 Internal Server Error]&amp;gt;.status_code\n\ntests\\test_member_routes.py:47: AssertionError\n&#34;}], &#34;tests/test_members_data_logic.py::test_add_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_add_member&#34;, &#34;duration&#34;: &#34;15 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_add_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;15 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;test_db = &amp;lt;sqlite3.Connection object at 0x000001783648F4C0&amp;gt;\n\n    def test_add_member(test_db):\n        member = Member(id=1, name=&amp;quot;John Doe&amp;quot;, email=&amp;quot;john@example.com&amp;quot;, phone=&amp;quot;1234567890&amp;quot;)\n        add_member(member)\n        result = get_member(1)\n&amp;gt;       assert result[&amp;quot;name&amp;quot;] == &amp;quot;John Doe&amp;quot;\nE       AssertionError: assert &amp;#x27;New Name&amp;#x27; == &amp;#x27;John Doe&amp;#x27;\nE         \nE         - John Doe\nE         + New Name\n\ntests\\test_members_data_logic.py:39: AssertionError\n&#34;}], &#34;tests/test_members_data_logic.py::test_get_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_get_member&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_get_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member = Member(name=&amp;#x27;Alice&amp;#x27;, email=&amp;#x27;alice@example.com&amp;#x27;, phone=&amp;#x27;9876543210&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n&amp;gt;           cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\nE           sqlite3.IntegrityError: UNIQUE constraint failed: Members.email\n\napp\\data_logic\\members_data_logic.py:100: IntegrityError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648D120&amp;gt;\n\n    def test_get_member(test_db):\n        member = Member(id=1, name=&amp;quot;Alice&amp;quot;, email=&amp;quot;alice@example.com&amp;quot;, phone=&amp;quot;9876543210&amp;quot;)\n&amp;gt;       add_member(member)\n\ntests\\test_members_data_logic.py:43: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember = Member(name=&amp;#x27;Alice&amp;#x27;, email=&amp;#x27;alice@example.com&amp;#x27;, phone=&amp;#x27;9876543210&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n            cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n&amp;gt;           raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\nE           sqlite3.Error: Database error: UNIQUE constraint failed: Members.email\n\napp\\data_logic\\members_data_logic.py:104: Error\n&#34;}], &#34;tests/test_members_data_logic.py::test_get_all_members&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_get_all_members&#34;, &#34;duration&#34;: &#34;00:00:05&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_get_all_members&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:05&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member = Member(name=&amp;#x27;Member One&amp;#x27;, email=&amp;#x27;one@example.com&amp;#x27;, phone=&amp;#x27;1111111111&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n&amp;gt;           cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\nE           sqlite3.OperationalError: database is locked\n\napp\\data_logic\\members_data_logic.py:100: OperationalError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648C6D0&amp;gt;\n\n    def test_get_all_members(test_db):\n        member1 = Member(id=1, name=&amp;quot;Member One&amp;quot;, email=&amp;quot;one@example.com&amp;quot;, phone=&amp;quot;1111111111&amp;quot;)\n        member2 = Member(id=2, name=&amp;quot;Member Two&amp;quot;, email=&amp;quot;two@example.com&amp;quot;, phone=&amp;quot;2222222222&amp;quot;)\n&amp;gt;       add_member(member1)\n\ntests\\test_members_data_logic.py:50: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember = Member(name=&amp;#x27;Member One&amp;#x27;, email=&amp;#x27;one@example.com&amp;#x27;, phone=&amp;#x27;1111111111&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n            cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n&amp;gt;           raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\nE           sqlite3.Error: Database error: database is locked\n\napp\\data_logic\\members_data_logic.py:104: Error\n&#34;}], &#34;tests/test_members_data_logic.py::test_edit_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_edit_member&#34;, &#34;duration&#34;: &#34;00:00:05&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_edit_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:05&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member = Member(name=&amp;#x27;Old Name&amp;#x27;, email=&amp;#x27;old@example.com&amp;#x27;, phone=&amp;#x27;9999999999&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n&amp;gt;           cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\nE           sqlite3.OperationalError: database is locked\n\napp\\data_logic\\members_data_logic.py:100: OperationalError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648C9A0&amp;gt;\n\n    def test_edit_member(test_db):\n        member = Member(id=1, name=&amp;quot;Old Name&amp;quot;, email=&amp;quot;old@example.com&amp;quot;, phone=&amp;quot;9999999999&amp;quot;)\n&amp;gt;       add_member(member)\n\ntests\\test_members_data_logic.py:57: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember = Member(name=&amp;#x27;Old Name&amp;#x27;, email=&amp;#x27;old@example.com&amp;#x27;, phone=&amp;#x27;9999999999&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n            cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n&amp;gt;           raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\nE           sqlite3.Error: Database error: database is locked\n\napp\\data_logic\\members_data_logic.py:104: Error\n&#34;}], &#34;tests/test_members_data_logic.py::test_get_nonexistent_member&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_get_nonexistent_member&#34;, &#34;duration&#34;: &#34;2 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_get_nonexistent_member&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;2 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member_id = 99\n\n    def get_member(member_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific member from the database by their ID.\n        Connects to the database, executes a query to fetch the member with the given ID, and returns the result as a dictionary.\n        Parameters:\n            member_id (int): The ID of the member to retrieve.\n        Returns:\n            member (dict): A dictionary representing the member.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(member_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Member ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            member = conn.execute(&amp;quot;SELECT * FROM Members WHERE id=?;&amp;quot;, (member_id,)).fetchone()\n            conn.close()\n    \n            if(not member):\n&amp;gt;               raise KeyError(&amp;quot;Member not found&amp;quot;)\nE               KeyError: &amp;#x27;Member not found&amp;#x27;\n\napp\\data_logic\\members_data_logic.py:46: KeyError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648E020&amp;gt;\n\n    def test_get_nonexistent_member(test_db):\n        with pytest.raises(KeyError):\n&amp;gt;           get_member(99)\n\ntests\\test_members_data_logic.py:65: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember_id = 99\n\n    def get_member(member_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific member from the database by their ID.\n        Connects to the database, executes a query to fetch the member with the given ID, and returns the result as a dictionary.\n        Parameters:\n            member_id (int): The ID of the member to retrieve.\n        Returns:\n            member (dict): A dictionary representing the member.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(member_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Member ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            member = conn.execute(&amp;quot;SELECT * FROM Members WHERE id=?;&amp;quot;, (member_id,)).fetchone()\n            conn.close()\n    \n            if(not member):\n                raise KeyError(&amp;quot;Member not found&amp;quot;)\n    \n            return dict(member)\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as e:\n&amp;gt;           raise Exception(f&amp;quot;Error: {e}&amp;quot;)\nE           Exception: Error: &amp;#x27;Member not found&amp;#x27;\n\napp\\data_logic\\members_data_logic.py:52: Exception\n&#34;}], &#34;tests/test_members_data_logic.py::test_add_member_without_email&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_add_member_without_email&#34;, &#34;duration&#34;: &#34;00:00:05&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_add_member_without_email&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:05&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member = Member(name=&amp;#x27;No Email&amp;#x27;, email=None, phone=&amp;#x27;7777777777&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n&amp;gt;           cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\nE           sqlite3.OperationalError: database is locked\n\napp\\data_logic\\members_data_logic.py:100: OperationalError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x000001783648DC60&amp;gt;\n\n    def test_add_member_without_email(test_db):\n        member = Member(id=1, name=&amp;quot;No Email&amp;quot;, email=None, phone=&amp;quot;7777777777&amp;quot;)\n&amp;gt;       add_member(member)\n\ntests\\test_members_data_logic.py:69: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember = Member(name=&amp;#x27;No Email&amp;#x27;, email=None, phone=&amp;#x27;7777777777&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n            cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n&amp;gt;           raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\nE           sqlite3.Error: Database error: database is locked\n\napp\\data_logic\\members_data_logic.py:104: Error\n&#34;}], &#34;tests/test_members_data_logic.py::test_get_member_with_negative_id&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_get_member_with_negative_id&#34;, &#34;duration&#34;: &#34;1 ms&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_get_member_with_negative_id&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;1 ms&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member_id = -1\n\n    def get_member(member_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific member from the database by their ID.\n        Connects to the database, executes a query to fetch the member with the given ID, and returns the result as a dictionary.\n        Parameters:\n            member_id (int): The ID of the member to retrieve.\n        Returns:\n            member (dict): A dictionary representing the member.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(member_id &amp;lt;= 0):\n&amp;gt;               raise ValueError(&amp;quot;Member ID must be a positive integer&amp;quot;)\nE               ValueError: Member ID must be a positive integer\n\napp\\data_logic\\members_data_logic.py:39: ValueError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x00000178364057B0&amp;gt;\n\n    def test_get_member_with_negative_id(test_db):\n        with pytest.raises(ValueError):\n&amp;gt;           get_member(-1)\n\ntests\\test_members_data_logic.py:75: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember_id = -1\n\n    def get_member(member_id: int):\n        &amp;quot;&amp;quot;&amp;quot;\n        Retrieve a specific member from the database by their ID.\n        Connects to the database, executes a query to fetch the member with the given ID, and returns the result as a dictionary.\n        Parameters:\n            member_id (int): The ID of the member to retrieve.\n        Returns:\n            member (dict): A dictionary representing the member.\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            if(member_id &amp;lt;= 0):\n                raise ValueError(&amp;quot;Member ID must be a positive integer&amp;quot;)\n    \n            conn = get_db_connection()\n            member = conn.execute(&amp;quot;SELECT * FROM Members WHERE id=?;&amp;quot;, (member_id,)).fetchone()\n            conn.close()\n    \n            if(not member):\n                raise KeyError(&amp;quot;Member not found&amp;quot;)\n    \n            return dict(member)\n        except sqlite3.Error as sqliteError:\n            raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\n        except Exception as e:\n&amp;gt;           raise Exception(f&amp;quot;Error: {e}&amp;quot;)\nE           Exception: Error: Member ID must be a positive integer\n\napp\\data_logic\\members_data_logic.py:52: Exception\n&#34;}], &#34;tests/test_members_data_logic.py::test_delete_member_with_active_allocations&#34;: [{&#34;extras&#34;: [], &#34;result&#34;: &#34;Failed&#34;, &#34;testId&#34;: &#34;tests/test_members_data_logic.py::test_delete_member_with_active_allocations&#34;, &#34;duration&#34;: &#34;00:00:06&#34;, &#34;resultsTableRow&#34;: [&#34;&lt;td class=\&#34;col-result\&#34;&gt;Failed&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-testId\&#34;&gt;tests/test_members_data_logic.py::test_delete_member_with_active_allocations&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-duration\&#34;&gt;00:00:06&lt;/td&gt;&#34;, &#34;&lt;td class=\&#34;col-links\&#34;&gt;&lt;/td&gt;&#34;], &#34;log&#34;: &#34;member = Member(name=&amp;#x27;Active Allocations&amp;#x27;, email=&amp;#x27;active@example.com&amp;#x27;, phone=&amp;#x27;6666666666&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n&amp;gt;           cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\nE           sqlite3.OperationalError: database is locked\n\napp\\data_logic\\members_data_logic.py:100: OperationalError\n\nDuring handling of the above exception, another exception occurred:\n\ntest_db = &amp;lt;sqlite3.Connection object at 0x0000017836405300&amp;gt;, monkeypatch = &amp;lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000017836525240&amp;gt;\n\n    def test_delete_member_with_active_allocations(test_db, monkeypatch):\n        member = Member(id=1, name=&amp;quot;Active Allocations&amp;quot;, email=&amp;quot;active@example.com&amp;quot;, phone=&amp;quot;6666666666&amp;quot;)\n&amp;gt;       add_member(member)\n\ntests\\test_members_data_logic.py:79: \n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ \n\nmember = Member(name=&amp;#x27;Active Allocations&amp;#x27;, email=&amp;#x27;active@example.com&amp;#x27;, phone=&amp;#x27;6666666666&amp;#x27;, id=1)\n\n    def add_member(member: Member):\n        &amp;quot;&amp;quot;&amp;quot;\n        Add a new member to the database.\n        Connects to the database, executes an insert query to add the member&amp;#x27;s details, and commits the transaction.\n        Parameters:\n            member (Member): An instance of the Member class containing the member&amp;#x27;s details.\n        Returns:\n            None\n        Raises:\n            sqliteError: If there is an issue with the database connection or query execution.\n        &amp;quot;&amp;quot;&amp;quot;\n        try:\n            conn = get_db_connection()\n            cursor = conn.cursor()\n            cursor.execute(&amp;quot;INSERT INTO Members (name, email, phone) VALUES (?, ?, ?);&amp;quot;, (member.name, member.email, member.phone))\n            conn.commit()\n            conn.close()\n        except sqlite3.Error as sqliteError:\n&amp;gt;           raise sqlite3.Error(f&amp;quot;Database error: {sqliteError}&amp;quot;)\nE           sqlite3.Error: Database error: database is locked\n\napp\\data_logic\\members_data_logic.py:104: Error\n&#34;}]}, &#34;renderCollapsed&#34;: [&#34;passed&#34;], &#34;initialSort&#34;: &#34;result&#34;, &#34;title&#34;: &#34;report.html&#34;}"></div>
+    <script>
+      (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
+const { getCollapsedCategory, setCollapsedIds } = require('./storage.js')
+
+class DataManager {
+    setManager(data) {
+        const collapsedCategories = [...getCollapsedCategory(data.renderCollapsed)]
+        const collapsedIds = []
+        const tests = Object.values(data.tests).flat().map((test, index) => {
+            const collapsed = collapsedCategories.includes(test.result.toLowerCase())
+            const id = `test_${index}`
+            if (collapsed) {
+                collapsedIds.push(id)
+            }
+            return {
+                ...test,
+                id,
+                collapsed,
+            }
+        })
+        const dataBlob = { ...data, tests }
+        this.data = { ...dataBlob }
+        this.renderData = { ...dataBlob }
+        setCollapsedIds(collapsedIds)
+    }
+
+    get allData() {
+        return { ...this.data }
+    }
+
+    resetRender() {
+        this.renderData = { ...this.data }
+    }
+
+    setRender(data) {
+        this.renderData.tests = [...data]
+    }
+
+    toggleCollapsedItem(id) {
+        this.renderData.tests = this.renderData.tests.map((test) =>
+            test.id === id ? { ...test, collapsed: !test.collapsed } : test,
+        )
+    }
+
+    set allCollapsed(collapsed) {
+        this.renderData = { ...this.renderData, tests: [...this.renderData.tests.map((test) => (
+            { ...test, collapsed }
+        ))] }
+    }
+
+    get testSubset() {
+        return [...this.renderData.tests]
+    }
+
+    get environment() {
+        return this.renderData.environment
+    }
+
+    get initialSort() {
+        return this.data.initialSort
+    }
+}
+
+module.exports = {
+    manager: new DataManager(),
+}
+
+},{"./storage.js":8}],2:[function(require,module,exports){
+const mediaViewer = require('./mediaviewer.js')
+const templateEnvRow = document.getElementById('template_environment_row')
+const templateResult = document.getElementById('template_results-table__tbody')
+
+function htmlToElements(html) {
+    const temp = document.createElement('template')
+    temp.innerHTML = html
+    return temp.content.childNodes
+}
+
+const find = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return elem.querySelector(selector)
+}
+
+const findAll = (selector, elem) => {
+    if (!elem) {
+        elem = document
+    }
+    return [...elem.querySelectorAll(selector)]
+}
+
+const dom = {
+    getStaticRow: (key, value) => {
+        const envRow = templateEnvRow.content.cloneNode(true)
+        const isObj = typeof value === 'object' && value !== null
+        const values = isObj ? Object.keys(value).map((k) => `${k}: ${value[k]}`) : null
+
+        const valuesElement = htmlToElements(
+            values ? `<ul>${values.map((val) => `<li>${val}</li>`).join('')}<ul>` : `<div>${value}</div>`)[0]
+        const td = findAll('td', envRow)
+        td[0].textContent = key
+        td[1].appendChild(valuesElement)
+
+        return envRow
+    },
+    getResultTBody: ({ testId, id, log, extras, resultsTableRow, tableHtml, result, collapsed }) => {
+        const resultBody = templateResult.content.cloneNode(true)
+        resultBody.querySelector('tbody').classList.add(result.toLowerCase())
+        resultBody.querySelector('tbody').id = testId
+        resultBody.querySelector('.collapsible').dataset.id = id
+
+        resultsTableRow.forEach((html) => {
+            const t = document.createElement('template')
+            t.innerHTML = html
+            resultBody.querySelector('.collapsible').appendChild(t.content)
+        })
+
+        if (log) {
+            // Wrap lines starting with "E" with span.error to color those lines red
+            const wrappedLog = log.replace(/^E.*$/gm, (match) => `<span class="error">${match}</span>`)
+            resultBody.querySelector('.log').innerHTML = wrappedLog
+        } else {
+            resultBody.querySelector('.log').remove()
+        }
+
+        if (collapsed) {
+            resultBody.querySelector('.collapsible > td')?.classList.add('collapsed')
+            resultBody.querySelector('.extras-row').classList.add('hidden')
+        } else {
+            resultBody.querySelector('.collapsible > td')?.classList.remove('collapsed')
+        }
+
+        const media = []
+        extras?.forEach(({ name, format_type, content }) => {
+            if (['image', 'video'].includes(format_type)) {
+                media.push({ path: content, name, format_type })
+            }
+
+            if (format_type === 'html') {
+                resultBody.querySelector('.extraHTML').insertAdjacentHTML('beforeend', `<div>${content}</div>`)
+            }
+        })
+        mediaViewer.setup(resultBody, media)
+
+        // Add custom html from the pytest_html_results_table_html hook
+        tableHtml?.forEach((item) => {
+            resultBody.querySelector('td[class="extra"]').insertAdjacentHTML('beforeend', item)
+        })
+
+        return resultBody
+    },
+}
+
+module.exports = {
+    dom,
+    htmlToElements,
+    find,
+    findAll,
+}
+
+},{"./mediaviewer.js":6}],3:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const storageModule = require('./storage.js')
+
+const getFilteredSubSet = (filter) =>
+    manager.allData.tests.filter(({ result }) => filter.includes(result.toLowerCase()))
+
+const doInitFilter = () => {
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+}
+
+const doFilter = (type, show) => {
+    if (show) {
+        storageModule.showCategory(type)
+    } else {
+        storageModule.hideCategory(type)
+    }
+
+    const currentFilter = storageModule.getVisible()
+    const filteredSubset = getFilteredSubSet(currentFilter)
+    manager.setRender(filteredSubset)
+
+    const sortColumn = storageModule.getSort()
+    doSort(sortColumn, true)
+}
+
+module.exports = {
+    doFilter,
+    doInitFilter,
+}
+
+},{"./datamanager.js":1,"./sort.js":7,"./storage.js":8}],4:[function(require,module,exports){
+const { redraw, bindEvents, renderStatic } = require('./main.js')
+const { doInitFilter } = require('./filter.js')
+const { doInitSort } = require('./sort.js')
+const { manager } = require('./datamanager.js')
+const data = JSON.parse(document.getElementById('data-container').dataset.jsonblob)
+
+function init() {
+    manager.setManager(data)
+    doInitFilter()
+    doInitSort()
+    renderStatic()
+    redraw()
+    bindEvents()
+}
+
+init()
+
+},{"./datamanager.js":1,"./filter.js":3,"./main.js":5,"./sort.js":7}],5:[function(require,module,exports){
+const { dom, find, findAll } = require('./dom.js')
+const { manager } = require('./datamanager.js')
+const { doSort } = require('./sort.js')
+const { doFilter } = require('./filter.js')
+const {
+    getVisible,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    getSortDirection,
+    possibleFilters,
+} = require('./storage.js')
+
+const removeChildren = (node) => {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild)
+    }
+}
+
+const renderStatic = () => {
+    const renderEnvironmentTable = () => {
+        const environment = manager.environment
+        const rows = Object.keys(environment).map((key) => dom.getStaticRow(key, environment[key]))
+        const table = document.getElementById('environment')
+        removeChildren(table)
+        rows.forEach((row) => table.appendChild(row))
+    }
+    renderEnvironmentTable()
+}
+
+const addItemToggleListener = (elem) => {
+    elem.addEventListener('click', ({ target }) => {
+        const id = target.parentElement.dataset.id
+        manager.toggleCollapsedItem(id)
+
+        const collapsedIds = getCollapsedIds()
+        if (collapsedIds.includes(id)) {
+            const updated = collapsedIds.filter((item) => item !== id)
+            setCollapsedIds(updated)
+        } else {
+            collapsedIds.push(id)
+            setCollapsedIds(collapsedIds)
+        }
+        redraw()
+    })
+}
+
+const renderContent = (tests) => {
+    const sortAttr = getSort(manager.initialSort)
+    const sortAsc = JSON.parse(getSortDirection())
+    const rows = tests.map(dom.getResultTBody)
+    const table = document.getElementById('results-table')
+    const tableHeader = document.getElementById('results-table-head')
+
+    const newTable = document.createElement('table')
+    newTable.id = 'results-table'
+
+    // remove all sorting classes and set the relevant
+    findAll('.sortable', tableHeader).forEach((elem) => elem.classList.remove('asc', 'desc'))
+    tableHeader.querySelector(`.sortable[data-column-type="${sortAttr}"]`)?.classList.add(sortAsc ? 'desc' : 'asc')
+    newTable.appendChild(tableHeader)
+
+    if (!rows.length) {
+        const emptyTable = document.getElementById('template_results-table__body--empty').content.cloneNode(true)
+        newTable.appendChild(emptyTable)
+    } else {
+        rows.forEach((row) => {
+            if (!!row) {
+                findAll('.collapsible td:not(.col-links', row).forEach(addItemToggleListener)
+                find('.logexpander', row).addEventListener('click',
+                    (evt) => evt.target.parentNode.classList.toggle('expanded'),
+                )
+                newTable.appendChild(row)
+            }
+        })
+    }
+
+    table.replaceWith(newTable)
+}
+
+const renderDerived = () => {
+    const currentFilter = getVisible()
+    possibleFilters.forEach((result) => {
+        const input = document.querySelector(`input[data-test-result="${result}"]`)
+        input.checked = currentFilter.includes(result)
+    })
+}
+
+const bindEvents = () => {
+    const filterColumn = (evt) => {
+        const { target: element } = evt
+        const { testResult } = element.dataset
+
+        doFilter(testResult, element.checked)
+        const collapsedIds = getCollapsedIds()
+        const updated = manager.renderData.tests.map((test) => {
+            return {
+                ...test,
+                collapsed: collapsedIds.includes(test.id),
+            }
+        })
+        manager.setRender(updated)
+        redraw()
+    }
+
+    const header = document.getElementById('environment-header')
+    header.addEventListener('click', () => {
+        const table = document.getElementById('environment')
+        table.classList.toggle('hidden')
+        header.classList.toggle('collapsed')
+    })
+
+    findAll('input[name="filter_checkbox"]').forEach((elem) => {
+        elem.addEventListener('click', filterColumn)
+    })
+
+    findAll('.sortable').forEach((elem) => {
+        elem.addEventListener('click', (evt) => {
+            const { target: element } = evt
+            const { columnType } = element.dataset
+            doSort(columnType)
+            redraw()
+        })
+    })
+
+    document.getElementById('show_all_details').addEventListener('click', () => {
+        manager.allCollapsed = false
+        setCollapsedIds([])
+        redraw()
+    })
+    document.getElementById('hide_all_details').addEventListener('click', () => {
+        manager.allCollapsed = true
+        const allIds = manager.renderData.tests.map((test) => test.id)
+        setCollapsedIds(allIds)
+        redraw()
+    })
+}
+
+const redraw = () => {
+    const { testSubset } = manager
+
+    renderContent(testSubset)
+    renderDerived()
+}
+
+module.exports = {
+    redraw,
+    bindEvents,
+    renderStatic,
+}
+
+},{"./datamanager.js":1,"./dom.js":2,"./filter.js":3,"./sort.js":7,"./storage.js":8}],6:[function(require,module,exports){
+class MediaViewer {
+    constructor(assets) {
+        this.assets = assets
+        this.index = 0
+    }
+
+    nextActive() {
+        this.index = this.index === this.assets.length - 1 ? 0 : this.index + 1
+        return [this.activeFile, this.index]
+    }
+
+    prevActive() {
+        this.index = this.index === 0 ? this.assets.length - 1 : this.index -1
+        return [this.activeFile, this.index]
+    }
+
+    get currentIndex() {
+        return this.index
+    }
+
+    get activeFile() {
+        return this.assets[this.index]
+    }
+}
+
+
+const setup = (resultBody, assets) => {
+    if (!assets.length) {
+        resultBody.querySelector('.media').classList.add('hidden')
+        return
+    }
+
+    const mediaViewer = new MediaViewer(assets)
+    const container = resultBody.querySelector('.media-container')
+    const leftArrow = resultBody.querySelector('.media-container__nav--left')
+    const rightArrow = resultBody.querySelector('.media-container__nav--right')
+    const mediaName = resultBody.querySelector('.media__name')
+    const counter = resultBody.querySelector('.media__counter')
+    const imageEl = resultBody.querySelector('img')
+    const sourceEl = resultBody.querySelector('source')
+    const videoEl = resultBody.querySelector('video')
+
+    const setImg = (media, index) => {
+        if (media?.format_type === 'image') {
+            imageEl.src = media.path
+
+            imageEl.classList.remove('hidden')
+            videoEl.classList.add('hidden')
+        } else if (media?.format_type === 'video') {
+            sourceEl.src = media.path
+
+            videoEl.classList.remove('hidden')
+            imageEl.classList.add('hidden')
+        }
+
+        mediaName.innerText = media?.name
+        counter.innerText = `${index + 1} / ${assets.length}`
+    }
+    setImg(mediaViewer.activeFile, mediaViewer.currentIndex)
+
+    const moveLeft = () => {
+        const [media, index] = mediaViewer.prevActive()
+        setImg(media, index)
+    }
+    const doRight = () => {
+        const [media, index] = mediaViewer.nextActive()
+        setImg(media, index)
+    }
+    const openImg = () => {
+        window.open(mediaViewer.activeFile.path, '_blank')
+    }
+    if (assets.length === 1) {
+        container.classList.add('media-container--fullscreen')
+    } else {
+        leftArrow.addEventListener('click', moveLeft)
+        rightArrow.addEventListener('click', doRight)
+    }
+    imageEl.addEventListener('click', openImg)
+}
+
+module.exports = {
+    setup,
+}
+
+},{}],7:[function(require,module,exports){
+const { manager } = require('./datamanager.js')
+const storageModule = require('./storage.js')
+
+const genericSort = (list, key, ascending, customOrder) => {
+    let sorted
+    if (customOrder) {
+        sorted = list.sort((a, b) => {
+            const aValue = a.result.toLowerCase()
+            const bValue = b.result.toLowerCase()
+
+            const aIndex = customOrder.findIndex((item) => item.toLowerCase() === aValue)
+            const bIndex = customOrder.findIndex((item) => item.toLowerCase() === bValue)
+
+            // Compare the indices to determine the sort order
+            return aIndex - bIndex
+        })
+    } else {
+        sorted = list.sort((a, b) => a[key] === b[key] ? 0 : a[key] > b[key] ? 1 : -1)
+    }
+
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const durationSort = (list, ascending) => {
+    const parseDuration = (duration) => {
+        if (duration.includes(':')) {
+            // If it's in the format "HH:mm:ss"
+            const [hours, minutes, seconds] = duration.split(':').map(Number)
+            return (hours * 3600 + minutes * 60 + seconds) * 1000
+        } else {
+            // If it's in the format "nnn ms"
+            return parseInt(duration)
+        }
+    }
+    const sorted = list.sort((a, b) => parseDuration(a['duration']) - parseDuration(b['duration']))
+    if (ascending) {
+        sorted.reverse()
+    }
+    return sorted
+}
+
+const doInitSort = () => {
+    const type = storageModule.getSort(manager.initialSort)
+    const ascending = storageModule.getSortDirection()
+    const list = manager.testSubset
+    const initialOrder = ['Error', 'Failed', 'Rerun', 'XFailed', 'XPassed', 'Skipped', 'Passed']
+
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    if (type?.toLowerCase() === 'original') {
+        manager.setRender(list)
+    } else {
+        let sortedList
+        switch (type) {
+        case 'duration':
+            sortedList = durationSort(list, ascending)
+            break
+        case 'result':
+            sortedList = genericSort(list, type, ascending, initialOrder)
+            break
+        default:
+            sortedList = genericSort(list, type, ascending)
+            break
+        }
+        manager.setRender(sortedList)
+    }
+}
+
+const doSort = (type, skipDirection) => {
+    const newSortType = storageModule.getSort(manager.initialSort) !== type
+    const currentAsc = storageModule.getSortDirection()
+    let ascending
+    if (skipDirection) {
+        ascending = currentAsc
+    } else {
+        ascending = newSortType ? false : !currentAsc
+    }
+    storageModule.setSort(type)
+    storageModule.setSortDirection(ascending)
+
+    const list = manager.testSubset
+    const sortedList = type === 'duration' ? durationSort(list, ascending) : genericSort(list, type, ascending)
+    manager.setRender(sortedList)
+}
+
+module.exports = {
+    doInitSort,
+    doSort,
+}
+
+},{"./datamanager.js":1,"./storage.js":8}],8:[function(require,module,exports){
+const possibleFilters = [
+    'passed',
+    'skipped',
+    'failed',
+    'error',
+    'xfailed',
+    'xpassed',
+    'rerun',
+]
+
+const getVisible = () => {
+    const url = new URL(window.location.href)
+    const settings = new URLSearchParams(url.search).get('visible')
+    const lower = (item) => {
+        const lowerItem = item.toLowerCase()
+        if (possibleFilters.includes(lowerItem)) {
+            return lowerItem
+        }
+        return null
+    }
+    return settings === null ?
+        possibleFilters :
+        [...new Set(settings?.split(',').map(lower).filter((item) => item))]
+}
+
+const hideCategory = (categoryToHide) => {
+    const url = new URL(window.location.href)
+    const visibleParams = new URLSearchParams(url.search).get('visible')
+    const currentVisible = visibleParams ? visibleParams.split(',') : [...possibleFilters]
+    const settings = [...new Set(currentVisible)].filter((f) => f !== categoryToHide).join(',')
+
+    url.searchParams.set('visible', settings)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const showCategory = (categoryToShow) => {
+    if (typeof window === 'undefined') {
+        return
+    }
+    const url = new URL(window.location.href)
+    const currentVisible = new URLSearchParams(url.search).get('visible')?.split(',').filter(Boolean) ||
+        [...possibleFilters]
+    const settings = [...new Set([categoryToShow, ...currentVisible])]
+    const noFilter = possibleFilters.length === settings.length || !settings.length
+
+    noFilter ? url.searchParams.delete('visible') : url.searchParams.set('visible', settings.join(','))
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getSort = (initialSort) => {
+    const url = new URL(window.location.href)
+    let sort = new URLSearchParams(url.search).get('sort')
+    if (!sort) {
+        sort = initialSort || 'result'
+    }
+    return sort
+}
+
+const setSort = (type) => {
+    const url = new URL(window.location.href)
+    url.searchParams.set('sort', type)
+    window.history.pushState({}, null, unescape(url.href))
+}
+
+const getCollapsedCategory = (renderCollapsed) => {
+    let categories
+    if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href)
+        const collapsedItems = new URLSearchParams(url.search).get('collapsed')
+        switch (true) {
+        case !renderCollapsed && collapsedItems === null:
+            categories = ['passed']
+            break
+        case collapsedItems?.length === 0 || /^["']{2}$/.test(collapsedItems):
+            categories = []
+            break
+        case /^all$/.test(collapsedItems) || collapsedItems === null && /^all$/.test(renderCollapsed):
+            categories = [...possibleFilters]
+            break
+        default:
+            categories = collapsedItems?.split(',').map((item) => item.toLowerCase()) || renderCollapsed
+            break
+        }
+    } else {
+        categories = []
+    }
+    return categories
+}
+
+const getSortDirection = () => JSON.parse(sessionStorage.getItem('sortAsc')) || false
+const setSortDirection = (ascending) => sessionStorage.setItem('sortAsc', ascending)
+
+const getCollapsedIds = () => JSON.parse(sessionStorage.getItem('collapsedIds')) || []
+const setCollapsedIds = (list) => sessionStorage.setItem('collapsedIds', JSON.stringify(list))
+
+module.exports = {
+    getVisible,
+    hideCategory,
+    showCategory,
+    getCollapsedIds,
+    setCollapsedIds,
+    getSort,
+    setSort,
+    getSortDirection,
+    setSortDirection,
+    getCollapsedCategory,
+    possibleFilters,
+}
+
+},{}]},{},[4]);
+    </script>
+  </footer>
+</html>

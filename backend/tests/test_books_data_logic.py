@@ -80,3 +80,45 @@ def test_delete_allocated_book(test_db):
     add_book(book)
     with pytest.raises(Exception, match="Cannot delete a book that has been allocated"):
         delete_book(1)
+
+# Additional rigorous test cases
+def test_add_book_with_long_name(test_db):
+    long_name = "A" * 256  # Exceeding typical length limits
+    book = Book(id=1, name=long_name, author="Author", total_copies=1, allocated_copies=0)
+    add_book(book)
+    result = get_book(1)
+    assert result["name"] == long_name
+
+def test_add_book_with_empty_name(test_db):
+    with pytest.raises(ValueError):
+        book = Book(id=1, name="", author="Author", total_copies=1, allocated_copies=0)
+        add_book(book)
+
+def test_add_duplicate_books(test_db):
+    book1 = Book(id=1, name="Duplicate Book", author="Same Author", total_copies=2, allocated_copies=0)
+    book2 = Book(id=2, name="Duplicate Book", author="Same Author", total_copies=3, allocated_copies=0)
+    add_book(book1)
+    add_book(book2)
+    books = get_all_books()
+    assert len(books) == 2  # Different IDs but same name
+
+def test_delete_nonexistent_book(test_db):
+    with pytest.raises(KeyError):
+        delete_book(99)
+
+def test_edit_book_to_invalid_values(test_db):
+    book = Book(id=1, name="Valid Book", author="Author", total_copies=2, allocated_copies=0)
+    add_book(book)
+    with pytest.raises(ValueError):
+        updated_book = Book(id=1, name="", author="", total_copies=-5, allocated_copies=0)
+        edit_book(1, updated_book)
+
+def test_add_book_with_large_copies(test_db):
+    book = Book(id=1, name="Big Library", author="Collector", total_copies=1000000, allocated_copies=0)
+    add_book(book)
+    result = get_book(1)
+    assert result["total_copies"] == 1000000
+
+def test_get_book_by_invalid_name(test_db):
+    with pytest.raises(KeyError):
+        get_book("Nonexistent Book")
