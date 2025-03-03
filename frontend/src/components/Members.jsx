@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Assignment as AssignmentIcon } from '@mui/icons-material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 import { MemberDetailsModal } from './MemberDetailsModal';
 import { AddMemberModal } from './AddMemberModal';
 import { EditMemberModal } from './EditMemberModal';
@@ -101,9 +101,6 @@ const Members = () => {
                   </IconButton>
                   <IconButton onClick={(e) => { e.stopPropagation(); /* Add delete functionality here */ }}>
                     <DeleteIcon />
-                  </IconButton>
-                  <IconButton onClick={(e) => { e.stopPropagation(); /* Add allocate functionality here */ }}>
-                    <AssignmentIcon />
                   </IconButton>
                 </TableCell>
               </TableRow>
