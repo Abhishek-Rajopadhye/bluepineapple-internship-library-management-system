@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from models import Book
-import data_logic.books_data_logic as book_crud
+from fastapi.responses import JSONResponse
+from app.models import Book
+import app.data_logic.books_data_logic as book_crud
 import sqlite3
 
 router = APIRouter(tags=["Books"])
@@ -19,7 +20,7 @@ def getBooks() -> list:
     """
     try:
         books = book_crud.get_all_books()
-        return books, 200
+        return JSONResponse(content=books, status_code=200)
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
@@ -41,7 +42,7 @@ def getBook(book_id: str) -> dict:
     """
     try:
         book = book_crud.get_book(int(book_id))
-        return book, 200
+        return JSONResponse(content=book, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -66,7 +67,7 @@ def addBook(book: Book) -> dict:
     """
     try:
         book_crud.add_book(book)
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except sqlite3.IntegrityError as e:
         raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
     except sqlite3.Error as e:
@@ -91,7 +92,7 @@ def editBook(book_id: str, book: Book) -> dict:
     """
     try:
         book_crud.edit_book(int(book_id), book)
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -117,7 +118,7 @@ def deleteBook(book_id: str) -> dict:
     """
     try:
         book_crud.delete_book(int(book_id))
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:

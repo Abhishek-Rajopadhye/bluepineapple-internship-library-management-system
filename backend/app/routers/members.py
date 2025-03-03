@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from models import Member
-import data_logic.members_data_logic as member_crud
+from fastapi.responses import JSONResponse
+from app.models import Member
+import app.data_logic.members_data_logic as member_crud
 import sqlite3
 
 router = APIRouter(tags=["Members"])
@@ -19,7 +20,7 @@ def getMembers() -> list:
     """
     try:
         members = member_crud.get_all_members()
-        return members, 200
+        return JSONResponse(content=members, status_code=200)
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
@@ -41,7 +42,7 @@ def getMember(member_id: str) -> dict:
     """
     try:
         member = member_crud.get_member(int(member_id))
-        return member, 200
+        return JSONResponse(content=member, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -66,7 +67,7 @@ def addMember(member: Member) -> dict:
     """
     try:
         member_crud.add_member(member)
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except sqlite3.IntegrityError as e:
         raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
     except sqlite3.Error as e:
@@ -91,7 +92,7 @@ def editMember(member_id: str, member: Member) -> dict:
     """
     try:
         member_crud.edit_member(int(member_id), member)
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -117,7 +118,7 @@ def deleteMember(member_id: str) -> dict:
     """
     try:
         member_crud.delete_member(int(member_id))
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:

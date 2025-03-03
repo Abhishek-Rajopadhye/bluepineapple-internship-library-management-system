@@ -1,42 +1,73 @@
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+body {
+    margin: 0;
+    font-family: 'Roboto', sans-serif;
+    background-color: #003153;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.AppBar {
+    background-color: #02192a;
+    width: 100%;
+    position: fixed;
+    top: 0;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.Toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.SearchBar {
+    position: relative;
+    border-radius: 4px;
+    background-color: #0a63a3;
+    margin-left: auto;
+    width: 45%;
 }
 
-.card {
-  padding: 2em;
+.SearchIconWrapper {
+    padding: 0 16px;
+    height: 100%;
+    position: absolute;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.read-the-docs {
-  color: #888;
+.InputBase {
+    color: inherit;
+    width: 100%;
+}
+
+.Container {
+    margin-top: 80px;
+    margin-bottom: 56px;
+}
+
+.TableContainer {
+    margin-top: 16px;
+}
+
+.DialogTitle {
+    background-color: #3f51b5;
+    color: #fff;
+}
+
+.DialogContent {
+    padding: 16px;
+}
+
+.DialogActions {
+    padding: 8px 16px;
+}
+
+.Button {
+    margin: 8px 0;
+}
+
+.BottomNavigation {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
 }

@@ -7,15 +7,21 @@ def get_db_connection():
     """
     Establish a connection to the database.
     Connects to the SQLite database specified by DB_PATH and sets the row factory to sqlite3.Row for dictionary-like access to rows.
+    If the database file does not exist, it creates the file.
     Parameters:
         None
     Returns:
         conn (sqlite3.Connection): A connection object to the SQLite database.
     Raises:
-        sqlit3.Error: If there is an issue with the database connection or query execution.
+        sqlite3.Error: If there is an issue with the database connection or query execution.
         Exception: If any other error occurs
     """
     try:
+        # Check if the database file exists, if not, create it
+        if not DB_PATH.exists():
+            DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+            DB_PATH.touch()
+
         conn = sqlite3.connect(str(DB_PATH.absolute()))
         conn.row_factory = sqlite3.Row
         return conn

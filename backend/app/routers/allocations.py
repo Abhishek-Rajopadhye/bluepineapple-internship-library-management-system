@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
-from models import Allocation
-import data_logic.allocations_data_logic as allocation_crud
+from fastapi.responses import JSONResponse
+from app.models import Allocation
+import app.data_logic.allocations_data_logic as allocation_crud
 import sqlite3
 
 router = APIRouter(tags=["Allocations"])
@@ -19,7 +20,7 @@ def getAllocations() -> list:
     """
     try:
         allocations = allocation_crud.get_all_allocation()
-        return allocations, 200
+        return JSONResponse(content=allocations, status_code=200)
     except sqlite3.Error as e:
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     except Exception as e:
@@ -41,7 +42,7 @@ def getAllocation(allocation_id: str) -> dict:
     """
     try:
         allocation = allocation_crud.get_allocation(int(allocation_id))
-        return allocation, 200
+        return JSONResponse(content=allocation, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -66,7 +67,7 @@ def getAllocationsOfBook(book_id: str) -> list:
     """
     try:
         allocations = allocation_crud.get_allocations_of_book(int(book_id))
-        return allocations, 200
+        return JSONResponse(content=allocations, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except sqlite3.Error as e:
@@ -90,7 +91,7 @@ def getAllocationsOfMember(member_id: str) -> list:
     """
     try:
         allocations = allocation_crud.get_allocations_of_member(int(member_id))
-        return allocations, 200
+        return JSONResponse(content=allocations, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except sqlite3.Error as e:
@@ -115,7 +116,7 @@ def getAllocationByBookAndMember(book_id: str, member_id: str) -> dict:
     """
     try:
         allocation = allocation_crud.get_allocation_by_book_and_member(int(book_id), int(member_id))
-        return allocation, 200
+        return JSONResponse(content=allocation, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -133,14 +134,14 @@ def addAllocation(allocation: Allocation) -> dict:
     Parameters:
         allocation (Allocation): An instance of the Allocation class containing the allocation's details.
     Returns:
-        dict: A success message.
+        msg (dict): A success message.
     Raises:
         HTTPException (400): If there is an integrity error.
         HTTPException (500): If any error occurs during adding of the allocation.
     """
     try:
         allocation_crud.add_allocation(allocation)
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except sqlite3.IntegrityError as e:
         raise HTTPException(status_code=400, detail=f"Integrity error: {e}")
     except sqlite3.Error as e:
@@ -157,7 +158,7 @@ def editAllocation(allocation_id: str, allocation: Allocation) -> dict:
         allocation_id (str): The ID of the allocation to edit.
         allocation (Allocation): An instance of the Allocation class containing the updated allocation's details.
     Returns:
-        dict: A success message.
+        msg (dict): A success message.
     Raises:
         HTTPException (400): If the allocation ID is not a positive integer.
         HTTPException (404): If the allocation is not found.
@@ -165,7 +166,7 @@ def editAllocation(allocation_id: str, allocation: Allocation) -> dict:
     """
     try:
         allocation_crud.edit_allocation(int(allocation_id), allocation)
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
@@ -183,7 +184,7 @@ def deleteAllocation(allocation_id: str) -> dict:
     Parameters:
         allocation_id (str): The ID of the allocation to delete.
     Returns:
-        dict: A success message.
+        msg (dict): A success message.
     Raises:
         HTTPException (400): If the allocation ID is not a positive integer.
         HTTPException (404): If the allocation is not found.
@@ -191,7 +192,7 @@ def deleteAllocation(allocation_id: str) -> dict:
     """
     try:
         allocation_crud.delete_allocation(int(allocation_id))
-        return {"msg": "Success"}, 200
+        return JSONResponse(content={"msg": "Success"}, status_code=200)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except KeyError as e:
