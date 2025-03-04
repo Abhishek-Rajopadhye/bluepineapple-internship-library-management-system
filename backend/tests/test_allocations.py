@@ -40,7 +40,7 @@ def override_get_db_connection():
     conn.commit()
     return conn
 
-app.dependency_overrides[get_db_connection] = override_get_db_connection
+app.dependency_overrides = {get_db_connection: override_get_db_connection}
 
 @pytest.fixture(scope="function")
 def test_db():
@@ -97,10 +97,13 @@ def test_get_allocations_of_member(test_db):
     assert len(response.json()) > 0
 
 def test_edit_allocation(test_db):
-    test_db.execute("INSERT INTO Allocations (book_id, member_id, start_date, end_date) VALUES (1, 1, '2024-03-01', '2024-03-10')")
+    test_db.execute(
+        "INSERT INTO Allocations (book_id, member_id, start_date, end_date, returned, overdue) VALUES (1, 1, '2024-03-01', '2024-03-10', 0, 0)"
+    )
     test_db.commit()
     
     updated_data = {
+        "id": 1,
         "book_id": 1,
         "member_id": 1,
         "start_date": "2024-03-02",
@@ -109,7 +112,7 @@ def test_edit_allocation(test_db):
         "overdue": False
     }
     response = client.put("/allocations/1", json=updated_data)
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
     assert response.json() == {"msg": "Success"}
 
 def test_delete_allocation(test_db):
@@ -122,12 +125,13 @@ def test_delete_allocation(test_db):
 
 def test_get_nonexistent_allocation(test_db):
     response = client.get("/allocations/999")
-    assert response.status_code == 404
-
+    assert response.status_code == 404, response.text
+    
 def test_delete_nonexistent_allocation(test_db):
     response = client.delete("/allocations/999")
-    assert response.status_code == 404
-
+    assert response.status_code == 404, response.text
+    
 def test_invalid_allocation_id(test_db):
     response = client.get("/allocations/abc")
     assert response.status_code == 400
+    

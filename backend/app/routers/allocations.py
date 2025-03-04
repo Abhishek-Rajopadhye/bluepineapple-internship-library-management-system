@@ -41,6 +41,8 @@ def getAllocation(allocation_id: str) -> dict:
         HTTPException (500): If any error occurs during fetching of the allocation.
     """
     try:
+        if(not allocation_id.isdigit()):
+            raise ValueError("Allocation ID must be a positive integer")
         allocation = allocation_crud.get_allocation(int(allocation_id))
         return JSONResponse(content=allocation, status_code=200)
     except ValueError as valueError:
