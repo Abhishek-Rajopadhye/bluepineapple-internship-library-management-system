@@ -1,3 +1,18 @@
+/**
+ * @file Books.jsx
+ * @description This component displays a list of books and provides functionalities to add, edit, allocate, and delete books.
+ * @component
+ * @name Books
+ * @requires react
+ * @requires axios
+ * @requires @mui/material
+ * @requires @mui/icons-material
+ * @requires ./BookDetailsModal
+ * @requires ./AddBookModal
+ * @requires ./EditBookModal
+ * @requires ./AllocateBookModal
+ * @export Books
+ */
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
@@ -7,6 +22,12 @@ import { AddBookModal } from './AddBookModal';
 import { EditBookModal } from './EditBookModal';
 import { AllocateBookModal } from './AllocateBookModal';
 
+/**
+ * Books component that displays a list of books and provides functionalities to add, edit, allocate, and delete books.
+ * @component
+ * @name Books
+ * @returns {JSX.Element} The rendered Books component.
+ */
 const Books = () => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);

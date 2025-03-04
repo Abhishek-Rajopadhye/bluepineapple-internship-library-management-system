@@ -1,7 +1,27 @@
+/**
+ * @file AddBookModal.jsx
+ * @description This component provides a modal dialog for adding a new book.
+ * @component
+ * @name AddBookModal
+ * @requires react
+ * @requires @mui/material
+ * @requires prop-types
+ * @export AddBookModal
+ */
 import { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 
+/**
+ * AddBookModal component that provides a modal dialog for adding a new book.
+ * @component
+ * @name AddBookModal
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Indicates whether the modal is open.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Function} props.onAdd - Function to add a new book.
+ * @returns {JSX.Element} The rendered AddBookModal component.
+ */
 const AddBookModal = ({ open, onClose, onAdd }) => {
     const [name, setName] = useState('');
     const [author, setAuthor] = useState('');

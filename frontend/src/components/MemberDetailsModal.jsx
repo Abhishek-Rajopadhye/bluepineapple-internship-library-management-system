@@ -1,8 +1,33 @@
+/**
+ * @file MemberDetailsModal.jsx
+ * @description This component provides a modal dialog for displaying member details and allocations.
+ * @component
+ * @name MemberDetailsModal
+ * @requires react
+ * @requires axios
+ * @requires @mui/material
+ * @requires prop-types
+ * @export MemberDetailsModal
+ */
 import { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText } from '@mui/material';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
+/**
+ * MemberDetailsModal component that provides a modal dialog for displaying member details and allocations.
+ * @component
+ * @name MemberDetailsModal
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Indicates whether the modal is open.
+ * @param {Function} props.onClose - Function to close
+ * @param {Object} props.member - The member details.
+ * @param {number} props.member.id - The member ID.
+ * @param {string} props.member.name - The member name.
+ * @param {string} props.member.email - The member email.
+ * @param {number} props.member.phone - The member phone.
+ * @returns {JSX.Element} The rendered MemberDetailsModal component.
+ */
 const MemberDetailsModal = ({ open, onClose, member }) => {
     const [allocations, setAllocations] = useState([]);
     const [loading, setLoading] = useState(true);

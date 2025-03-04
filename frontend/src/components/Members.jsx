@@ -1,3 +1,17 @@
+/**
+ * @file Members.jsx
+ * @description This component displays a list of members and provides functionalities to add, edit, and delete members.
+ * @component
+ * @name Members
+ * @requires react
+ * @requires axios
+ * @requires @mui/material
+ * @requires @mui/icons-material
+ * @requires ./MemberDetailsModal
+ * @requires ./AddMemberModal
+ * @requires ./EditMemberModal
+ * @export Members
+ */
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
@@ -6,6 +20,12 @@ import { MemberDetailsModal } from './MemberDetailsModal';
 import { AddMemberModal } from './AddMemberModal';
 import { EditMemberModal } from './EditMemberModal';
 
+/**
+ * Members component displays a list of members and provides functionalities to add, edit, and delete members.
+ * @component
+ * @name Members
+ * @returns {JSX.Element} The rendered Members component.
+ */
 const Members = () => {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);

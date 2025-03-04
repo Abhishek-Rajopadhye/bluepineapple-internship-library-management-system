@@ -1,7 +1,27 @@
+/**
+ * @file AllocateBookModal.jsx
+ * @description This component provides a modal dialog for allocating a book to a member.
+ * @component
+ * @name AllocatebookModal
+ * @requires react
+ * @requires @mui/material
+ * @requires prop-types
+ * @export AllocatebookModal
+ */
 import { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem } from '@mui/material';
 import PropTypes from 'prop-types';
 
+/**
+ * AllocatebookModal component that provides a modal dialog for allocating a book to a member.
+ * @component
+ * @name AllocatebookModal
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Indicates whether the modal is open.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Function} props.onAllocate - Function to allocate a new book.
+ * @returns {JSX.Element} The rendered AddBookModal component.
+ */
 const AllocateBookModal = ({ open, onClose, onAllocate }) => {
   const [members, setMembers] = useState([]);
   const [memberId, setMemberId] = useState('');

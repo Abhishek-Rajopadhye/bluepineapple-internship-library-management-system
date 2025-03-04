@@ -2,7 +2,6 @@ import pytest
 from fastapi.testclient import TestClient
 from app import app
 from app.database import get_db_connection
-from app.models import Allocation
 import sqlite3
 
 client = TestClient(app)

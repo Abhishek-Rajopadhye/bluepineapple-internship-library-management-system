@@ -1,7 +1,33 @@
+/**
+ * @file EditMemberModal.jsx
+ * @description This component provides a modal dialog for editing member details.
+ * @component
+ * @name EditMemberModal
+ * @requires react
+ * @requires axios
+ * @requires @mui/material
+ * @requires prop-types
+ * @export EditMemberModal
+ */
 import { useState, useEffect } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 
+/**
+ * EditMemberModal component that provides a modal dialog for editing member details.
+ * @component
+ * @name EditMemberModal
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Indicates whether the modal is open.
+ * @param {Function} props.onClose - Function to close
+ * @param {Object} props.member - The member details.
+ * @param {number} props.member.id - The member ID.
+ * @param {string} props.member.name - The member name.
+ * @param {string} props.member.email - The member email.
+ * @param {number} props.member.phone - The member phone.
+ * @param {Function} props.onSave - Function to edit the member.
+ * @returns {JSX.Element} The rendered EditMemberModal component.
+ */
 const EditMemberModal = ({ open, onClose, member, onSave }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');

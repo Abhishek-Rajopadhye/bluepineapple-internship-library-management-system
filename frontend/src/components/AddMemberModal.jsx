@@ -1,7 +1,27 @@
+/**
+ * @file AddMemberModal.jsx
+ * @description This component provides a modal dialog for adding a new member.
+ * @component
+ * @name AddMemberModal
+ * @requires react
+ * @requires @mui/material
+ * @requires prop-types
+ * @export AddMemberModal
+ */
 import { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 import PropTypes from 'prop-types';
 
+/**
+ * AddMemberModal component that provides a modal dialog for adding a new member.
+ * @component
+ * @name AddMemberModal
+ * @param {Object} props - The component props.
+ * @param {boolean} props.open - Indicates whether the modal is open.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Function} props.onAdd - Function to add a new member.
+ * @returns {JSX.Element} The rendered AddMemberModal component.
+ */
 const AddMemberModal = ({ open, onClose, onAdd }) => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');

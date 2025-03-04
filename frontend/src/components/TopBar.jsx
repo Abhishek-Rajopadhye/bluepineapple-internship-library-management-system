@@ -1,3 +1,14 @@
+/**
+ * @file TopBar.jsx
+ * @description A top navigation bar component for the Library Management System.
+ * It includes a search input field for filtering content dynamically.
+ * @component
+ * @name TopBar
+ * @requires react
+ * @requires @mui/material
+ * @requires @mui/icons-material
+ * @export TopBar
+ */
 import { styled, alpha } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -7,6 +18,9 @@ import InputBase from '@mui/material/InputBase';
 import SearchIcon from '@mui/icons-material/Search';
 import PropTypes from 'prop-types';
 
+/**
+ * Styled component for the search container.
+ */
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -18,6 +32,9 @@ const Search = styled('div')(({ theme }) => ({
     width: '45%',
 }));
 
+/**
+ * Styled component for the search icon wrapper.
+ */
 const SearchIconWrapper = styled('div')(({ theme }) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
@@ -28,6 +45,9 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     justifyContent: 'center',
 }));
 
+/**
+ * Styled component for the input field within the search bar.
+ */
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'inherit',
     width: '100%',
@@ -39,6 +59,16 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
+
+/**
+ * TopBar component that provides a navigation header with a search bar.
+ * @component
+ * @name TopBar
+ * @param {Object} props - The component props.
+ * @param {string} props.searchQuery - The current search query.
+ * @param {Function} props.handleSearchChange - The function to handle search input changes.
+ * @returns {JSX.Element} The rendered TopBar component.
+ */
 const TopBar = ({ searchQuery, handleSearchChange }) => {
     return (
         <Box sx={{ flexGrow: 1 }}>
