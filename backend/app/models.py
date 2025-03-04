@@ -11,9 +11,6 @@ class BookBase(BaseModel):
 class Book(BookBase):
     id: int
 
-    class Config:
-        from_attributes = True
-
 class MemberBase(BaseModel):
     name: str
     email: Optional[str]
@@ -21,9 +18,6 @@ class MemberBase(BaseModel):
 
 class Member(MemberBase):
     id: int
-
-    class Config:
-        from_attributes = True
 
 class AllocationBase(BaseModel):
     book_id: int
@@ -35,6 +29,3 @@ class Allocation(AllocationBase):
     id: int
     returned: bool = False
     overdue: bool = False
-
-    class Config:
-        from_attributes = True
