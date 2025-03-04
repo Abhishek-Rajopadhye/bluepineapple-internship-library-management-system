@@ -48,8 +48,12 @@ def get_member(member_id: int):
         return dict(member)
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
-    except Exception as e:
-        raise Exception(f"Error: {e}")
+    except ValueError:
+        raise ValueError("Member ID must be a positive integer")
+    except KeyError as memberNotFound:
+        raise KeyError(memberNotFound)
+    except Exception as error:
+        raise Exception(f"Error: {error}")
 
 def get_member_by_name(member_name: str):
     """
@@ -70,7 +74,7 @@ def get_member_by_name(member_name: str):
             raise ValueError("Member Name must be valid")
 
         conn = get_db_connection()
-        member = conn.execute("SELECT * FROM Members WHERE name=?;", (member_name,)).fetchone()
+        member = conn.execute("SELECT * FROM Members WHERE name=?", (member_name,)).fetchone()
         conn.close()
         
         if(not member):
@@ -80,8 +84,12 @@ def get_member_by_name(member_name: str):
 
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
-    except Exception as exception:
-        raise Exception(f"Error: {exception}")
+    except ValueError:
+        raise ValueError("Member ID must be a positive integer")
+    except KeyError as memberNotFound:
+        raise KeyError(memberNotFound)
+    except Exception as error:
+        raise Exception(f"Error: {error}")
 
 def add_member(member: Member):
     """
@@ -104,8 +112,8 @@ def add_member(member: Member):
         raise sqlite3.Error(f"Database error: {sqliteError}")
     except sqlite3.IntegrityError:
         raise Exception("Integrity error: Possible duplicate or constraint violation")
-    except Exception as e:
-        raise Exception(f"Error: {e}")
+    except Exception as error:
+        raise Exception(f"Error: {error}")
 
 def edit_member(member_id:int, member: Member):
     """
@@ -127,6 +135,7 @@ def edit_member(member_id:int, member: Member):
         existingMember = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
         
         if(not existingMember):
+            conn.close()
             raise KeyError("Member not found")
         
         cursor.execute("UPDATE Members SET name=?, email=?, phone=? WHERE id=?;", (member.name, member.email, member.phone, member_id))
@@ -134,8 +143,12 @@ def edit_member(member_id:int, member: Member):
         conn.close()
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
-    except Exception as e:
-        raise Exception(f"Error: {e}")
+    except ValueError:
+        raise ValueError("Member ID must be a positive integer")
+    except KeyError as memberNotFound:
+        raise KeyError(memberNotFound)
+    except Exception as error:
+        raise Exception(f"Error: {error}")
 
 def delete_member(member_id: int):
     """
@@ -157,6 +170,7 @@ def delete_member(member_id: int):
         existingMember = conn.execute("SELECT * FROM Members WHERE id=?;", (member_id,)).fetchone()
         
         if(not existingMember):
+            conn.close()
             raise KeyError("Member not found")
         
         activeAllocations = conn.execute("SELECT * FROM Allocations WHERE member_id=?;", (member_id,)).fetchall()
@@ -170,5 +184,9 @@ def delete_member(member_id: int):
         conn.close()
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
-    except Exception as e:
-        raise Exception(f"Error: {e}")
+    except ValueError:
+        raise ValueError("Member ID must be a positive integer")
+    except KeyError as memberNotFound:
+        raise KeyError(memberNotFound)
+    except Exception as error:
+        raise Exception(f"Error: {error}")

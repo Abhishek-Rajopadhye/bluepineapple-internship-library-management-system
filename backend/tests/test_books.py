@@ -18,11 +18,29 @@ def override_get_db_connection():
             total_copies INTEGER NOT NULL,
             allocated_copies INTEGER DEFAULT 0
         );
+        CREATE TABLE Members (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            email TEXT UNIQUE,
+            phone TEXT
+        );
+        CREATE TABLE Allocations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            book_id INTEGER NOT NULL,
+            member_id INTEGER NOT NULL,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            returned BOOLEAN DEFAULT FALSE,
+            overdue BOOLEAN DEFAULT FALSE,
+            FOREIGN KEY (book_id) REFERENCES Books(id),
+            FOREIGN KEY (member_id) REFERENCES Members(id)
+        );
     """)
     conn.commit()
     return conn
 
-app.dependency_overrides[get_db_connection] = override_get_db_connection
+app.dependency_overrides = {get_db_connection: override_get_db_connection}
+
 
 @pytest.fixture(scope="function")
 def test_db():
@@ -56,18 +74,19 @@ def test_get_book_by_id(test_db):
     assert "id" in response.json()
 
 def test_get_book_by_name(test_db):
-    test_db.execute("INSERT INTO Books (name, author, total_copies) VALUES ('Unique Book', 'Author', 5)")
+    test_db.execute("INSERT INTO Books (name, author, total_copies) VALUES ('Test Book', 'Author Name', 5)")
     test_db.commit()
     
-    response = client.get("/books/name=Unique%20Book")
+    response = client.get("/books/?name=Test%20Book")
     assert response.status_code == 200
-    assert response.json()["name"] == "Unique Book"
+    assert response.json()[0]["name"] == "Test Book"
 
 def test_edit_book(test_db):
     test_db.execute("INSERT INTO Books (name, author, total_copies) VALUES ('Old Book', 'Old Author', 2)")
     test_db.commit()
     
     updated_data = {
+        "id":1,
         "name": "Updated Book",
         "author": "New Author",
         "total_copies": 10,

@@ -53,6 +53,10 @@ def get_book(book_id: int):
 
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
+    except ValueError as valueError:
+        raise ValueError(valueError)
+    except KeyError as bookNotFound:
+        raise KeyError(bookNotFound)
     except Exception as exception:
         raise Exception(f"Error: {exception}")
 
@@ -85,8 +89,13 @@ def get_book_by_name(book_name: str):
 
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
+    except ValueError as valueError:
+        raise ValueError(valueError)
+    except KeyError as bookNotFound:
+        raise KeyError(bookNotFound)
     except Exception as exception:
         raise Exception(f"Error: {exception}")
+
 
 def add_book(book: Book):
     """
@@ -146,8 +155,13 @@ def edit_book(book_id:int, book: Book):
         conn.close()
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
+    except ValueError as valueError:
+        raise ValueError(valueError)
+    except KeyError as bookNotFound:
+        raise KeyError(bookNotFound)
     except Exception as exception:
-        raise RuntimeError(f"Error: {exception}")
+        raise Exception(f"Error: {exception}")
+
 
 def delete_book(book_id: int):
     """
@@ -182,5 +196,10 @@ def delete_book(book_id: int):
         conn.close()
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
+    except ValueError as valueError:
+        raise ValueError(valueError)
+    except KeyError as bookNotFound:
+        raise KeyError(bookNotFound)
     except Exception as exception:
         raise Exception(f"Error: {exception}")
+

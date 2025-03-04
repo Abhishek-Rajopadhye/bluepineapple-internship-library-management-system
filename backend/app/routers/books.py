@@ -41,6 +41,8 @@ def getBook(book_id: str) -> dict:
         HTTPException (500): If any error occurs during fetching of the book.
     """
     try:
+        if(not book_id.isdigit()):
+            raise ValueError("Book ID is not a number")
         book = book_crud.get_book(int(book_id))
         return JSONResponse(content=book, status_code=200)
     except ValueError as valueError:
@@ -52,7 +54,7 @@ def getBook(book_id: str) -> dict:
     except Exception as exception:
         raise HTTPException(status_code=500, detail=f"Error: {exception}")
 
-@router.get("/name={book_name}")
+@router.get("/?name={book_name}")
 def getBookByName(book_name: str) -> dict:
     """
     Retrieve a specific book from the database by its name.
