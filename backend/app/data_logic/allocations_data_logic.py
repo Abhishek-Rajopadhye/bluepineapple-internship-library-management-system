@@ -42,18 +42,9 @@ def get_allocation(allocation_id: int):
             raise ValueError
         conn = get_db_connection()
         allocation = conn.execute("SELECT * FROM Allocations WHERE id=?;", (allocation_id,)).fetchone()
-        if(not allocation):
-            conn.close()
-            raise KeyError("Allocation not found")
-        
-        end_date = datetime.datetime.strptime(allocation["end_date"], "%Y-%m-%d")
-        if(end_date < datetime.datetime.now()):
-            conn.execute("UPDATE Allocations SET overdue = 1 WHERE id=?",(allocation_id))
-            conn.execute("UPDATE History SET overdue = 1 WHERE id=?", (allocation_id))
-            conn.commit()
-            allocation = conn.execute("SELECT * FROM Allocations WHERE id=?;", (allocation_id,)).fetchone()
-    
         conn.close()
+        if(not allocation):
+            raise KeyError("Allocation not found")        
         return dict(allocation)
     except sqlite3.Error as sqliteError:
         raise sqlite3.Error(f"Database error: {sqliteError}")
@@ -136,7 +127,7 @@ def get_allocation_by_book_and_member(book_id: int, member_id: int):
         if(not allocation):
             conn.close()
             raise KeyError
-
+        
         end_date = datetime.datetime.strptime(allocation["end_date"], "%Y-%m-%d")
         if(end_date < datetime.datetime.now()):
             conn.execute("UPDATE Allocations SET overdue = 1 WHERE id=?",(allocation["id"]))
@@ -204,18 +195,10 @@ def edit_allocation(allocation_id:int, allocation: Allocation):
             conn.close()
             raise KeyError
 
-        end_date = datetime.datetime.strptime(existingAllocation["end_date"], "%Y-%m-%d")
-        if(end_date < datetime.datetime.now()):
-            conn.execute("UPDATE Allocations SET overdue = 1 WHERE id=?",(existingAllocation["id"]))
-            conn.execute("UPDATE History SET overdue = 1 WHERE id=?", (existingAllocation["id"]))
-            conn.commit()
-            existingAllocation = conn.execute("SELECT * FROM Allocations WHERE id=?;", (existingAllocation["id"],)).fetchone()
-        
-        conn.close()
-        cursor.execute("UPDATE Allocations SET book_id=?, member_id=?, start_date=?, end_date=?, returned=?, overdue=? WHERE id=?;",
-                       (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue, allocation_id))
-        cursor.execute("UPDATE History SET book_id=?, member_id=?, start_date=?, end_date=?, returned=?, overdue=? WHERE id=?;",
-                       (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation.overdue, allocation_id))
+        cursor.execute("UPDATE Allocations SET book_id=?, member_id=?, start_date=?, end_date=?, returned=? WHERE id=?;",
+                       (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation_id))
+        cursor.execute("UPDATE History SET book_id=?, member_id=?, start_date=?, end_date=?, returned=? WHERE id=?;",
+                       (allocation.book_id, allocation.member_id, allocation.start_date, allocation.end_date, allocation.returned, allocation_id))
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:

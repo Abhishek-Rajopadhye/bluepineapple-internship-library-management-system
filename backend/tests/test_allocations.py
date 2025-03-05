@@ -107,7 +107,7 @@ def test_get_allocation_by_id(test_db):
     test_db.commit()
     
     response = client.get("/allocations/1")
-    assert response.status_code == 200
+    assert response.status_code == 200, response.text
     assert "id" in response.json()
 
 def test_get_allocations_of_book(test_db):
