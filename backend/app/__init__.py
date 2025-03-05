@@ -6,6 +6,7 @@ app = FastAPI(title="Library Management System")
 
 origins = [
     "http://localhost",
+    "http://localhost:5173"
     "http://localhost:8000",
     "http://localhost:3000",
 ]
