@@ -5,6 +5,7 @@
  * @name Books
  * @requires react
  * @requires axios
+ * @requires prop-types
  * @requires @mui/material
  * @requires @mui/icons-material
  * @requires ./BookDetailsModal
@@ -14,6 +15,7 @@
  * @export Books
  */
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Assignment as AssignmentIcon } from '@mui/icons-material';
@@ -26,9 +28,10 @@ import { AllocateBookModal } from './AllocateBookModal';
  * Books component that displays a list of books and provides functionalities to add, edit, allocate, and delete books.
  * @component
  * @name Books
+ * @param {string} searchQuery - Query entered into the search bar.
  * @returns {JSX.Element} The rendered Books component.
  */
-const Books = () => {
+const Books = ({ searchQuery }) => {
     const [books, setBooks] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -187,7 +190,7 @@ const Books = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                    {books.map((book) => (
+                    {books.filter(book => book.name.toLowerCase().includes(searchQuery) ).map((book) => (
                         <TableRow key={book.id} onClick={() => handleOpenDetails(book)} style={{ cursor: 'pointer' }}>
                             <TableCell>{book.name}</TableCell>
                             <TableCell>{book.author}</TableCell>
@@ -195,13 +198,22 @@ const Books = () => {
                             <TableCell>{book.allocated_copies}</TableCell>
                             <TableCell>
                                 <IconButton onClick={(event) => { event.stopPropagation(); handleOpenEdit(book); }}>
-                                    <EditIcon />
+                                    <EditIcon />      
+                                    <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                        Edit
+                                    </Typography>
                                 </IconButton>
-                                <IconButton onClick={(event) => { event.stopPropagation(); handleDeleteBook(book.id); }}>
-                                    <DeleteIcon />
+                                <IconButton color='error' onClick={(event) => { event.stopPropagation(); handleDeleteBook(book.id); }}>
+                                    <DeleteIcon color='error' />
+                                    <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                        Delete
+                                    </Typography>
                                 </IconButton>
                                 <IconButton onClick={(event) => { event.stopPropagation(); handleOpenAllocate(book); }}>
                                     <AssignmentIcon />
+                                    <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                        Allocate
+                                    </Typography>
                                 </IconButton>
                             </TableCell>
                         </TableRow>
@@ -209,12 +221,16 @@ const Books = () => {
                     </TableBody>
                 </Table>
             </TableContainer>  
-            <BookDetailsModal open={openDetails} onClose={handleCloseDetails} book={selectedBook} />
+            <BookDetailsModal open={openDetails} onClose={handleCloseDetails} book={selectedBook} setBook={setSelectedBook} />
             <AddBookModal open={openAdd} onClose={handleCloseAdd} onAdd={handleAddBook} />
             <EditBookModal open={openEdit} onClose={handleCloseEdit} book={selectedBook} onSave={handleEditBook} />
             <AllocateBookModal open={openAllocate} onClose={handleCloseAllocate} onAllocate={handleAllocateBook} />
         </Container>
     );
+};
+
+Books.propTypes = {
+    searchQuery: PropTypes.string.isRequired,
 };
 
 export { Books };

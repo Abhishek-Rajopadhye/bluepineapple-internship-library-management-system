@@ -10,15 +10,17 @@
  * @requires @mui/material
  * @requires ./componenets/Books
  * @requires ./componenets/Members
+ * @requires ./componenets/History
  * @requires ./components/TopBar
  * @requires ./components/BottomNav
  * @export App
  */
 import { useState } from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { Container } from '@mui/material';
 import { Books } from './components/Books';
 import { Members } from './components/Members';
+import { History } from './components/History';
 import { TopBar } from './components/TopBar';
 import { BottomNav } from './components/BottomNav';
 import './App.css';
@@ -46,16 +48,20 @@ function App() {
     };
 
     return (
+        <>
         <Router>
             <TopBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
             <Container className="Container">
                 <Routes>
+                    <Route path="/" element={<Navigate to="/books" />} />
                     <Route path="/books" element={<Books searchQuery={searchQuery} />} />
                     <Route path="/members" element={<Members searchQuery={searchQuery} />} />
+                    <Route path="/history" element={<History searchQuery={searchQuery} />} />
                 </Routes>
             </Container>
-            <BottomNav value={value} setValue={setValue} location={location} setLocation={setLocation}/>
         </Router>
+        <BottomNav value={value} setValue={setValue} location={location} setLocation={setLocation}/>
+        </>
     );
 }
 

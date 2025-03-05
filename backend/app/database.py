@@ -78,6 +78,20 @@ def init_db():
             FOREIGN KEY (member_id) REFERENCES Members(id)
         );
         """)
+        
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS History (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            book_id INTEGER NOT NULL,
+            member_id INTEGER NOT NULL,
+            start_date TEXT NOT NULL,
+            end_date TEXT NOT NULL,
+            returned BOOLEAN DEFAULT FALSE,
+            overdue BOOLEAN DEFAULT FALSE,
+            FOREIGN KEY (book_id) REFERENCES Books(id),
+            FOREIGN KEY (member_id) REFERENCES Members(id)
+        );
+        """)
 
         conn.commit()
         conn.close()

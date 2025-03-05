@@ -5,6 +5,7 @@
  * @name Members
  * @requires react
  * @requires axios
+ * @requires prop-types
  * @requires @mui/material
  * @requires @mui/icons-material
  * @requires ./MemberDetailsModal
@@ -13,6 +14,7 @@
  * @export Members
  */
 import { useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 import axios from 'axios';
 import { Container, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, CircularProgress, Button } from '@mui/material';
 import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
@@ -24,9 +26,10 @@ import { EditMemberModal } from './EditMemberModal';
  * Members component displays a list of members and provides functionalities to add, edit, and delete members.
  * @component
  * @name Members
+ * @param {string} searchQuery - Query entered into the search bar.
  * @returns {JSX.Element} The rendered Members component.
  */
-const Members = () => {
+const Members = ({ searchQuery }) => {
     const [members, setMembers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -154,17 +157,23 @@ const Members = () => {
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                        {members.map((member) => (
+                        {members.filter(member => member.name.toLowerCase().includes(searchQuery)).map((member) => (
                             <TableRow key={member.id} onClick={() => handleOpenDetails(member)} style={{ cursor: 'pointer' }}>
                                 <TableCell>{member.name}</TableCell>
                                 <TableCell>{member.email}</TableCell>
                                 <TableCell>{member.phone}</TableCell>
                                 <TableCell>
                                     <IconButton onClick={(event) => { event.stopPropagation(); handleOpenEdit(member); }}>
-                                        <EditIcon />
+                                        <EditIcon /> 
+                                        <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                            Edit
+                                        </Typography>
                                     </IconButton>
-                                    <IconButton onClick={(event) => { event.stopPropagation(); handleDeleteMember(member.id); }}>
-                                        <DeleteIcon />
+                                    <IconButton onClick={(event) => { event.stopPropagation(); handleDeleteMember(member.id); }} color='error'>
+                                        <DeleteIcon color='error' /> 
+                                        <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                            Delete
+                                        </Typography>
                                     </IconButton>
                                 </TableCell>
                             </TableRow>
@@ -178,6 +187,10 @@ const Members = () => {
             <EditMemberModal open={openEdit} onClose={handleCloseEdit} member={selectedMember} onSave={handleEditMember} />
         </Container>
     );
+};
+
+Members.propTypes = {
+    searchQuery: PropTypes.string.isRequired,
 };
 
 export { Members };

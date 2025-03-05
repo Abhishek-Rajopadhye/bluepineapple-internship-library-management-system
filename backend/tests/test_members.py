@@ -82,7 +82,6 @@ def test_get_member_by_name(test_db):
     json_response = response.json()
     if isinstance(json_response, list):
         json_response = json_response[0]
-    print(json_response)
     
     assert json_response["name"] == "John Doe"
     assert json_response["email"] == "john@example.com"

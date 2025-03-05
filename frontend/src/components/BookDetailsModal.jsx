@@ -11,7 +11,7 @@
  */
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import PropTypes from 'prop-types';
 
 /**
@@ -29,7 +29,7 @@ import PropTypes from 'prop-types';
  * @param {number} props.book.allocated_copies - The number of allocated copies.
  * @returns {JSX.Element} The rendered BookDetailsModal component.
  */
-const BookDetailsModal = ({ open, onClose, book }) => {
+const BookDetailsModal = ({ open, onClose, book, setBook }) => {
     const [allocations, setAllocations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -38,27 +38,26 @@ const BookDetailsModal = ({ open, onClose, book }) => {
         if (book) {
         const fetchAllocations = async () => {
             try {
-            const response = await axios.get(`http://localhost:8000/allocations/?book=${book.id.toString()}`);
-            if (response.status !== 200) {
-                throw new Error('Network response was not ok');
-            }
-            const data = response.data;
-
-            // Fetch member details for each allocation
-            const allocationsWithMemberNames = await Promise.all(
-                data.map(async (allocation) => {
-                const memberResponse = await axios.get(`http://localhost:8000/members/${allocation.member_id}`);
-                if (memberResponse.status !== 200) {
+                const response = await axios.get(`http://localhost:8000/allocations/?book=${book.id.toString()}`);
+                if (response.status !== 200) {
                     throw new Error('Network response was not ok');
                 }
-                return {
-                    ...allocation,
-                    member_name: memberResponse.data.name,
-                };
-                })
-            );
+                const data = response.data;
+                // Fetch member details for each allocation
+                const allocationsWithMemberNames = await Promise.all(
+                    data.map(async (allocation) => {
+                    const memberResponse = await axios.get(`http://localhost:8000/members/${allocation.member_id}`);
+                    if (memberResponse.status !== 200) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return {
+                        ...allocation,
+                        member_name: memberResponse.data.name,
+                    };
+                    })
+                );
 
-            setAllocations(allocationsWithMemberNames);
+                setAllocations(allocationsWithMemberNames);
             } catch (error) {
             setError(error.message);
             } finally {
@@ -69,6 +68,18 @@ const BookDetailsModal = ({ open, onClose, book }) => {
         fetchAllocations();
         }
     }, [book]);
+
+    const handleDeAllocate = async (allocation_id) => {
+        try {
+            const response = await axios.delete(`http://localhost:8000/allocations/${allocation_id}`);
+            if(response.status != 200){
+                throw new Error("Network response was not ok.")
+            }
+            setBook({ ...book, returned: 1 });
+        } catch (error){
+            console.log(error.message)
+        }
+    };
 
     return (
         <Dialog open={open} onClose={onClose}>
@@ -82,20 +93,26 @@ const BookDetailsModal = ({ open, onClose, book }) => {
                     <Typography variant="body2">Allocated Copies: {book.allocated_copies}</Typography>
                     <Typography variant="h6" style={{ marginTop: '16px' }}>Allocations</Typography>
                     {loading ? (
-                    <Typography>Loading...</Typography>
-                    ) : error ? (
-                    <Typography color="error">{error}</Typography>
-                    ) : (
-                    <List>
-                        {allocations.map((allocation) => (
-                        <ListItem key={allocation.id}>
-                            <ListItemText
-                            primary={`Member: ${allocation.member_name}`}
-                            secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
-                            />
-                        </ListItem>
-                        ))}
-                    </List>
+                        <Typography>Loading...</Typography>
+                        ) : error ? (
+                        <Typography color="error">{error}</Typography>
+                        ) : (
+                        <List>
+                            {allocations.map((allocation) => (
+                            <ListItem key={allocation.id}>
+                                <ListItemText
+                                primary={`Member: ${allocation.member_name}`}
+                                secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
+                                />
+                                <ListItemText primary={`${allocation.overdue ? "Overdue" : "Not Overdue"}`}/>
+                                <ListItemButton onClick={(event) => { event.stopPropagation(); handleDeAllocate(allocation.id); }}>
+                                    <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                        Return
+                                    </Typography>
+                                </ListItemButton>
+                            </ListItem>
+                            ))}
+                        </List>
                     )}
                 </>
                 )}
@@ -119,6 +136,7 @@ BookDetailsModal.propTypes = {
         total_copies: PropTypes.number,
         allocated_copies: PropTypes.number,
     }),
+    setBook: PropTypes.func.isRequired,
 };
 
 export { BookDetailsModal };

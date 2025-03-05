@@ -10,7 +10,7 @@
  * @export MemberDetailsModal
  */
 import { useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, List, ListItem, ListItemText, ListItemButton } from '@mui/material';
 import PropTypes from 'prop-types';
 import axios from 'axios';
 
@@ -69,6 +69,18 @@ const MemberDetailsModal = ({ open, onClose, member }) => {
         }
     }, [member]);
 
+    const handleDeAllocate = async (allocation_id) => {
+        try {
+            const response = await axios.delete(`http://localhost:8000/allocations/${allocation_id}`);
+            if(response.status != 200){
+                throw new Error("Network response was not ok.")
+            }            
+            console.log(response);
+        } catch (error){
+            console.log(error.message)
+        }
+    };
+    
     return (
         <Dialog open={open} onClose={onClose}>
         <DialogTitle>Member Details</DialogTitle>
@@ -92,6 +104,12 @@ const MemberDetailsModal = ({ open, onClose, member }) => {
                         primary={`Book: ${allocation.book_name}`}
                         secondary={`From: ${allocation.start_date} To: ${allocation.end_date}`}
                         />
+                        <ListItemText primary={`${allocation.overdue ? "Overdue" : "Not Overdue"}`}/>
+                        <ListItemButton onClick={(event) => { event.stopPropagation(); handleDeAllocate(allocation.id); }}>
+                            <Typography variant="button" gutterBottom sx={{ display: 'block' }}>
+                                Return
+                            </Typography>
+                        </ListItemButton>
                     </ListItem>
                     ))}
                 </List>

@@ -219,7 +219,11 @@ def delete_allocation(allocation_id: int):
             conn.close()
             raise KeyError("Allocation not found")
         
+        cursor.execute("INSERT INTO History (id, book_id, member_id, start_date, end_date, returned, overdue) VALUES (?, ?, ?, ?, ?, ?, ?);",
+                   (existingAllocation['id'], existingAllocation['book_id'], existingAllocation['member_id'], existingAllocation['start_date'], existingAllocation['end_date'], 1, existingAllocation['overdue']))
         cursor.execute("DELETE FROM Allocations WHERE id=?;", (allocation_id,))
+        cursor.execute("UPDATE Books SET allocated_copies = allocated_copies - 1 WHERE id=?", (existingAllocation['book_id'],))
+        
         conn.commit()
         conn.close()
     except sqlite3.Error as sqliteError:

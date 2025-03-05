@@ -9,55 +9,47 @@
  * @export BottomNav
  */
 import { BottomNavigation, BottomNavigationAction } from '@mui/material';
-import { Book as BookIcon, People as PeopleIcon } from '@mui/icons-material';
-import PropTypes from 'prop-types';
-
+import { Book as BookIcon, People as PeopleIcon, History as HistoryIcon } from '@mui/icons-material';
 
 /**
  * BottomNav component that provides navigation between Books and Members sections.
  * @component
  * @name BottomNav
- * @param {Object} props - The component props.
- * @param {number} props.value - The current selected navigation value.
- * @param {Function} props.setValue - The function to update the navigation value.
- * @param {string} props.location - The current location state.
- * @param {Function} props.setLocation - The function to update the location state.
  * @returns {JSX.Element} The rendered BottomNav component.
  */
-const BottomNav = ({ value, setValue, location, setLocation }) => {
-  return (
-    <BottomNavigation
-      value={value}
-      showLabels
-      className="BottomNavigation"
-    >
-      <BottomNavigationAction 
-        label="Books" 
-        icon={<BookIcon color={location == "books" ? "primary" : "disabled" } />} 
-        onClick={() => {
-          setValue(0);
-          setLocation("books")
-          window.location.href = '/books';
-        }}
-      />
-      <BottomNavigationAction 
-        label="Members" 
-        icon={<PeopleIcon color={location == "members" ? "primary" : "disabled" } />} 
-        onClick={() => {
-          setValue(1);
-          setLocation("members")
-          window.location.href = '/members';
-        }} 
-      />
-    </BottomNavigation>
-  );
-};
-
-BottomNav.propTypes = {
-    value: PropTypes.number.isRequired,
-    setValue: PropTypes.func.isRequired,
-    location: PropTypes.string.isRequired,
-    setLocation: PropTypes.func.isRequired
+const BottomNav = () => {
+    return (
+        <BottomNavigation
+        value={localStorage.getItem("Location") == "books" ? 0 : (localStorage.getItem("Location") == "members" ? 1 : 2)}
+        showLabels
+        className="BottomNavigation"
+        >
+        <BottomNavigationAction 
+            label="Books" 
+            icon={<BookIcon color={localStorage.getItem("Location") == "books" ? "primary" : "disabled" } />} 
+            onClick={() => {
+            localStorage.setItem("Location", "books")
+            window.location.href = '/books';
+            }}
+        />
+        <BottomNavigationAction 
+            label="Members" 
+            icon={<PeopleIcon color={localStorage.getItem("Location") == "members" ? "primary" : "disabled" } />} 
+            onClick={() => {
+            localStorage.setItem("Location", "members")
+            window.location.href = '/members';
+            }} 
+        />
+        <BottomNavigationAction 
+            label="History" 
+            icon={<HistoryIcon color={localStorage.getItem("Location") == "history" ? "primary" : "disabled" } />} 
+            onClick={() => {
+            localStorage.setItem("Location", "history")
+            window.location.href = '/history';
+            }} 
+        />
+        </BottomNavigation>
+    );
 };
 
 export { BottomNav };

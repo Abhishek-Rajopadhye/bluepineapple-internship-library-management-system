@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routers import books, members, allocations
+from .routers import books, members, allocations, history
 
 app = FastAPI(title="Library Management System")
 
@@ -21,3 +21,4 @@ app.add_middleware(
 app.include_router(books.router, prefix="/books")
 app.include_router(members.router, prefix="/members")
 app.include_router(allocations.router, prefix="/allocations")
+app.include_router(history.router, prefix="/history")
