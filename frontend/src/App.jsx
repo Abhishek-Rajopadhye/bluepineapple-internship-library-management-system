@@ -34,8 +34,6 @@ import './App.css';
  */
 function App() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [value, setValue] = useState(0);
-    const [location, setLocation] = useState("books")
 
     /**
      * Handles search input changes and updates the search query state.
@@ -60,7 +58,7 @@ function App() {
                 </Routes>
             </Container>
         </Router>
-        <BottomNav value={value} setValue={setValue} location={location} setLocation={setLocation}/>
+        <BottomNav/>
         </>
     );
 }

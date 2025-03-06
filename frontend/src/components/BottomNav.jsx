@@ -20,13 +20,13 @@ import { Book as BookIcon, People as PeopleIcon, History as HistoryIcon } from '
 const BottomNav = () => {
     return (
         <BottomNavigation
-        value={localStorage.getItem("Location") == "books" ? 0 : (localStorage.getItem("Location") == "members" ? 1 : 2)}
+        value={localStorage.getItem("Location") == "books" || null ? 0 : (localStorage.getItem("Location") == "members" ? 1 : 2)}
         showLabels
         className="BottomNavigation"
         >
         <BottomNavigationAction 
             label="Books" 
-            icon={<BookIcon color={localStorage.getItem("Location") == "books" ? "primary" : "disabled" } />} 
+            icon={<BookIcon color={localStorage.getItem("Location") == "books" || null ? "primary" : "disabled" } />} 
             onClick={() => {
             localStorage.setItem("Location", "books")
             window.location.href = '/books';
